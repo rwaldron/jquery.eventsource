@@ -12,7 +12,9 @@
     return this.each(function () {
       
       /*
-        create event source
+        create event source, 
+        
+        feature detect, fallback to long polling xhr if no support
         
         process callback
         
@@ -37,6 +39,8 @@ $(function () {
   //  USE CASES/EXAMPLES 
   //  ROUGHING OUT THE API
   
+  
+  //  Calling on and pushing contents to elements
   $('div').eventsource({
     url:    'eventsource uri',
     event:  function (data) {
@@ -44,6 +48,19 @@ $(function () {
       //do something with the data
       
       return foo;
+    
+    }
+  });
+  
+  
+  // Calling and doing whatever
+  $.eventsource({
+    url:    'eventsource uri',
+    event:  function (data) {
+      
+      //do something with the data
+      
+      
     
     }
   });
