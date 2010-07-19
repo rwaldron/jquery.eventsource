@@ -2,9 +2,9 @@
 ;(function ($) {
 
   var defaults  = {
-    url: location.href,
-    connect: $.noop,
-    event: $.noop
+    url:      location.href,
+    connect:  $.noop,
+    event:    $.noop
   };
   
   $.fn.eventsource = function (options) {
@@ -35,6 +35,11 @@
           
         if $.eventsource
           - process callbacks
+          
+          
+        
+        additonally, the first arg to the callbacks should be a normalized copy of the
+        contents found at event.data, where the second arg should be the event object.
       
       */
      
