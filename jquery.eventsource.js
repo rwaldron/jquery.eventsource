@@ -2,7 +2,9 @@
 ;(function ($) {
 
   var defaults  = {
-  
+    url: location.href,
+    connect: $.noop,
+    event: $.noop
   };
   
   $.fn.eventsource = function (options) {
@@ -16,9 +18,23 @@
         
         feature detect, fallback to long polling xhr if no support
         
-        process callback
+        connect to event source; 
         
-        feed return to selector(s)
+        eventsource dom events:
+        
+          - trigger connect callback when connect event is fired, if set
+        
+          - trigger event callback when message event is fired, if set
+          
+          
+        
+        
+        if $.fn.eventsource:
+          - process callbacks (above)
+          - feed return to selector(s)
+          
+        if $.eventsource
+          - process callbacks
       
       */
      
