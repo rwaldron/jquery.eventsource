@@ -130,14 +130,14 @@
               lastEventId: streamCache[options.label].lastEventId
             });
 
-            /*
+            
             setTimeout(
               function () {
                 pluginSubFn._private.openPollingSource.call(this, options);
               },
-              5000000//500 // matches speed of native EventSource
+              500// matches speed of native EventSource
             );
-            */
+            
           },
           cache:      false,
           timeout:    50000,
@@ -201,15 +201,6 @@
       if ( isNative ) {
         pluginSubFn._private.openEventSource(_options);
       }
-      
-      
-      //  !!!!! !USE ONLY FOR DEV - MUST BE REMOVED.
-      setTimeout(function () {
-        
-        stream.close();
-      
-      }, 1000);
-      
       
       return streamCache;
     }
