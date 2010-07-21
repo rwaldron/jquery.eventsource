@@ -1,7 +1,7 @@
 
 ;(function ($) {
   
-  var eventSourceSettings  = {
+  var streamSrcSettings  = {
     //  IDENTITY  
     label:    '',
     url:      location.href,
@@ -20,15 +20,6 @@
     
     public: {
       close: function ( label ) {
-        if ( !isNative ) {
-          
-          // ajax abort
-          
-        }
-        
-        streamCache[label] && streamCache[label].stream.close();  
-      },
-      delete: function ( label ) {
         if ( streamCache[label] ) {
           return;
         }
@@ -46,42 +37,98 @@
       }
     },    
     _private: {
-      openEventSource: function ( label ) {
-        console.log(streamCache);      
+
+      isJson:       function ( arg ) {
+        if ( arg === null ) return false;
+        
+        var _test = $.isPlainObject(arg) ? JSON.stringify(arg) : arg;
+      
+        return ( new RegExp('^("(\\\\.|[^"\\\\\\n\\r])*?"|[,:{}\\[\\]0-9.\\-+Eaeflnr-u \\n\\r\\t])+?$') ).test(_test);        
+      },    
+    
+    
+      openEventSource: function ( options ) {
+           
 
 
 
-        //stream.addEventListener('open', function (event) {
-        //  console.log(event);
-        //}, false);
+        streamCache[options.label].stream.addEventListener('open', function (event) {
+        
+          // TODO....
+          console.log(event);
+        }, false);
 
 
-        //stream.addEventListener('message', function (event) {
-          //console.log(event);
-        //}, false);        
+        streamCache[options.label].stream.addEventListener('message', function (event) {
+        
+          var 
+          streamData  = [];
+          
+          streamData.push(
+            pluginSubFn._private.isJson(event.data) ? 
+              JSON.parse(event.data) : 
+              event.data
+          );
+          
+          streamCache[options.label].lastEventId = event.lastEventId;
+
+          options.message.call(this, streamData, {
+            data: streamData,
+            lastEventId: streamCache[options.label].lastEventId
+          });
+          
+          
+          
+        }, false);        
       }, 
       openPollingSource: function ( options ) {
         var source  = $.ajax({
           type:       'GET',
           url:        options.url,
           data:       options.data,
-          dataType:   options.dataType,
           beforeSend: function ( data ) {
             //console.log(data);
             //options.open.call(this, data);
           },
-          success: function ( data  ) {
+          success: function ( data ) {
 
-            console.log(data);
+            //console.log(data);
 
-            var streamData  = data.split(': '); // data streams MUST follow the "data: " format.
+            var 
+            
+            parsedData  = [],
+            streamData  = $.map(  data.split("\n"), function (sdata, i) {
+              if ( sdata ) {
+                return sdata;
+              }
+            });
+            
+            //console.log(streamData);
+            
+            if ( $.isArray(streamData) ) {
+              for ( var i = 0; i < streamData.length; i++ ) {
+                
+                
+                var tempdata  = streamData[i].split(': ')[1];
+                
+                // CONVERT TO PROPER `dataType` HERE
+                if ( options.dataType === 'json' ) {
+                  tempdata  = JSON.parse(tempdata);
+                }
 
-            console.log(streamData);
+              
+                parsedData.push(tempdata);
+              }
+            }
+            
+            streamCache[options.label].lastEventId++;
+            
+            
 
-
-            //options.message.call(this, data);
-
-
+            options.message.call(this, parsedData, {
+              data: parsedData,
+              lastEventId: streamCache[options.label].lastEventId
+            });
 
             /*
             setTimeout(
@@ -104,7 +151,8 @@
   streamSetup = {
     stream: {}, 
     lastEventId: 0,
-    isNative: false
+    isNative: false, 
+    options: {}
   },
   streamCache = {},
   isNative    = window.EventSource ? true : false 
@@ -135,7 +183,7 @@
                           options.label;
       
       //  CREATE NEW OPTIONS OBJECT
-      _options        = $.extend({}, eventSourceSettings, options);
+      _options        = $.extend({}, streamSrcSettings, options);
       
 
       stream  = !isNative ? 
@@ -146,50 +194,24 @@
       //  ADD TO EVENT SOURCES
       streamCache[_options.label] = $.extend({}, streamSetup, {
         stream: stream, 
-        isNative: isNative
+        isNative: isNative, 
+        options: _options
       });
       
       if ( isNative ) {
-        pluginSubFn._private.openEventSource();
+        pluginSubFn._private.openEventSource(_options);
       }
       
       
-      
-      /*
+      //  !!!!! !USE ONLY FOR DEV - MUST BE REMOVED.
       setTimeout(function () {
         
         stream.close();
       
       }, 1000);
       
-      */
-
-
+      
       return streamCache;
-    
-    /*
-        create event source, 
-
-        feature detect
-        
-          - fallback to long polling xhr if no support
-
-        connect to event source; 
-
-        eventsource dom events:
-
-          - trigger open callback when open event is fired, if set
-
-          - trigger message callback when message event is fired, if set
-
-        if $.eventsource
-          - process callbacks
-
-
-        additonally, the first arg to the callbacks should be a normalized copy of the
-        contents found at event.data, where the second arg should be the event object.
-
-      */
     }
   });
 
@@ -220,6 +242,7 @@ $(function () {
       console.groupEnd('$.eventsource() - Example 1 : TEXT message callback');
     }
   });
+  
   // PLAIN TEXT EXAMPLE - HAS CONTENT TYPE
   $.eventsource({
     url:      'test-event-sources/event-source-1.php',
@@ -258,22 +281,5 @@ $(function () {
   });
 
 
-  // JSON EXAMPLE - HAS CONTENT TYPE
-  $.eventsource({
-    url:      'test-event-sources/event-source-3.php',
-    dataType: 'json',
-    open:  function (data) {
-      console.group('$.eventsource() - Example 4 : JSON open callback');
-        console.log( 'opened' );
-        console.log(data);
-      console.groupEnd('$.eventsource() - Example 4 : JSON open callback');
-    },
-    message:  function (data) {
-      console.group('$.eventsource() - Example 4 : JSON message callback');
-        console.log( 'message received' );
-        console.log(data);
-      console.groupEnd('$.eventsource() - Example 4 : JSON message callback');
-    }
-  });  
 
 });
