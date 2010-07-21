@@ -59,6 +59,45 @@
         //stream.addEventListener('message', function (event) {
           //console.log(event);
         //}, false);        
+      }, 
+      openPollingSource: function ( options ) {
+        var source  = $.ajax({
+          type:       'GET',
+          url:        options.url,
+          data:       options.data,
+          dataType:   options.dataType,
+          beforeSend: function ( data ) {
+            //console.log(data);
+            //options.open.call(this, data);
+          },
+          success: function ( data  ) {
+
+            console.log(data);
+
+            var streamData  = data.split(': '); // data streams MUST follow the "data: " format.
+
+            console.log(streamData);
+
+
+            //options.message.call(this, data);
+
+
+
+            /*
+            setTimeout(
+              function () {
+                pluginSubFn._private.openPollingSource.call(this, options);
+              },
+              5000000//500 // matches speed of native EventSource
+            );
+            */
+          },
+          cache:      false,
+          timeout:    50000,
+          accepts:    options.accepts
+        });
+
+        return source;
       }
     }
   },
@@ -70,53 +109,7 @@
   streamCache = {},
   isNative    = window.EventSource ? true : false 
   ;
-  
-  //  FALLBACK SUPPORT 
-  if ( !isNative ) {
-    var pollingAjaxFallback = function ( options ) {
-      var source  = $.ajax({
-        type:       'GET',
-        url:        options.url,
-        data:       options.data,
-        dataType:   options.dataType,
-        beforeSend: function ( data ) {
-          //console.log(data);
-          //options.open.call(this, data);
-        },
-        success: function ( data  ) {
-          
-          console.log(data);
-          
-          var streamData  = data.split(': '); // data streams MUST follow the "data: " format.
-          
-          console.log(streamData);
-          
-          
-          //options.message.call(this, data);
-          
-          
-          
-          /*
-          setTimeout(
-            function () {
-              pollingAjaxFallback.call(this, options);
-            },
-            5000000//500 // matches speed of native EventSource
-          );
-          */
-        },
-        cache:      false,
-        timeout:    50000,
-        accepts:    options.accepts
-      });
-      
-      return source;
-    };  
-  }
-  
 
-  
-  
   $.extend({
     
     eventsource: function ( options ) {
@@ -146,7 +139,7 @@
       
 
       stream  = !isNative ? 
-                  pollingAjaxFallback(_options) :
+                  pluginSubFn._private.openPollingSource(_options) :
                   new EventSource(_options.url + ( _options.data ? '?' + _options.data : '' ) );
 
         
@@ -156,8 +149,9 @@
         isNative: isNative
       });
       
-      
-      pluginSubFn._private.openEventSource();
+      if ( isNative ) {
+        pluginSubFn._private.openEventSource();
+      }
       
       
       
@@ -171,7 +165,7 @@
       */
 
 
-      return;
+      return streamCache;
     
     /*
         create event source, 
@@ -196,15 +190,7 @@
         contents found at event.data, where the second arg should be the event object.
 
       */
-
-
-
- 
-    
     }
-  
-  
-  
   });
 
 })(jQuery);
