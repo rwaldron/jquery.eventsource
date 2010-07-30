@@ -29,6 +29,8 @@
         
         var cache = {};
         
+        console.log(label);
+        
         if ( label !== '*' ) {
           for ( var prop in streamCache ) {
             if ( label  !== prop ) {
@@ -38,6 +40,9 @@
         }
         
         streamCache = cache;
+      }, 
+      streams: function () {
+        return streamCache;
       }
     },    
     _private: {
@@ -169,13 +174,19 @@
       if ( options && !$.isPlainObject(options) && pluginFns.public[options] ) {
         
         //  IF NO LABEL WAS PASSED, SEND MESSAGE TO ALL STREAMS
-        pluginFns.public[options](  
-          arguments[1] ?
-            arguments[1]  :
-            '*'
-        );
+        if ( options === 'close' ) {
+          pluginFns.public[options](  
+            arguments[1] ?
+              arguments[1]  :
+              '*'
+          );
+          
+          return;
+        }
         
-        return;
+        return pluginFns.public[options]();  
+        
+        
       }
     
       
