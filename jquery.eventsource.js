@@ -41,9 +41,9 @@
       isJson:       function ( arg ) {
         if ( arg === null ) return false;
         
-        var _test = $.isPlainObject(arg) ? JSON.stringify(arg) : arg;
-      
-        return ( new RegExp('^("(\\\\.|[^"\\\\\\n\\r])*?"|[,:{}\\[\\]0-9.\\-+Eaeflnr-u \\n\\r\\t])+?$') ).test(_test);        
+        return ( 
+          new RegExp('^("(\\\\.|[^"\\\\\\n\\r])*?"|[,:{}\\[\\]0-9.\\-+Eaeflnr-u \\n\\r\\t])+?$') 
+        ).test($.isPlainObject(arg) ? JSON.stringify(arg) : arg);        
       },    
     
     
