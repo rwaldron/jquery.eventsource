@@ -9,8 +9,8 @@
   
   var streamSrcSettings  = {
     //  IDENTITY  
-    label:    '',
-    url:      location.href,
+    label:    null,
+    url:      null,
     
     //  EVENT CALLBACKS
     open:     $.noop,
@@ -54,8 +54,9 @@
       openEventSource: function ( options ) {
            
         streamCache[options.label].stream.addEventListener('open', function (event) {
-          //  TODO - INCOMPLETE
-          //  options.open.call(this, data);
+          if ( streamCache[options.label] ) {
+            options.open.call(this);
+          }   
         }, false);
 
 
@@ -75,7 +76,7 @@
 
             streamCache[options.label].lastEventId = event.lastEventId;
 
-            options.message.call(this, streamData[0], {
+            options.message.call(this, streamData[0] ? streamData[0] : null, {
               data: streamData,
               lastEventId: streamCache[options.label].lastEventId
             });
@@ -91,9 +92,10 @@
             type:       'GET',
             url:        options.url,
             data:       options.data,
-            beforeSend: function ( data ) {
-              //  TODO - INCOMPLETE
-              //  options.open.call(this, data);
+            beforeSend: function () {
+              if ( streamCache[options.label] ) {
+                options.open.call(this);
+              }   
             },
             success: function ( data ) {
 
@@ -124,7 +126,7 @@
 
               streamCache[options.label].lastEventId++;
 
-              options.message.call(this, parsedData[0], {
+              options.message.call(this, parsedData[0] ? parsedData[0] : null, {
                 data: parsedData,
                 lastEventId: streamCache[options.label].lastEventId
               });
