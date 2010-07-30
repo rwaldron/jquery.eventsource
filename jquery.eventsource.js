@@ -1,3 +1,9 @@
+/*!
+ * jQuery Event Source
+ * 
+ * Copyright (c) 2010 Rick Waldron
+ * Dual licensed under the MIT and GPL licenses.
+ */
 
 ;(function ($) {
   
@@ -7,8 +13,8 @@
     url:      location.href,
     
     //  EVENT CALLBACKS
-    open:  $.noop,
-    message: $.noop,
+    open:     $.noop,
+    message:  $.noop,
     
     //  EXTEND `accepts` OBJECT
     accepts: $.extend({}, $.ajaxSettings.accepts, {
@@ -16,20 +22,18 @@
     
     })   
   },
-  pluginSubFn  = {
+  pluginFns  = {
     
     public: {
       close: function ( label ) {
-        if ( streamCache[label] ) {
-          return;
-        }
-        //streamCache[label] && ( delete streamCache[label] );
         
         var cache = {};
         
-        for ( var prop in streamCache ) {
-          if ( label  !== prop ) {
-            cache[prop] = streamCache[prop];
+        if ( label !== '*' ) {
+          for ( var prop in streamCache ) {
+            if ( label  !== prop ) {
+              cache[prop] = streamCache[prop];
+            }
           }
         }
         
@@ -49,101 +53,95 @@
     
       openEventSource: function ( options ) {
            
-
-
-
         streamCache[options.label].stream.addEventListener('open', function (event) {
-        
-          // TODO....
-          console.log(event);
+          //  TODO - INCOMPLETE
+          //  options.open.call(this, data);
         }, false);
 
 
         streamCache[options.label].stream.addEventListener('message', function (event) {
-        
-          var 
-          streamData  = [];
           
-          streamData.push(
-            pluginSubFn._private.isJson(event.data) ? 
-              JSON.parse(event.data) : 
-              event.data
-          );
+          if ( streamCache[options.label] ) {
           
-          streamCache[options.label].lastEventId = event.lastEventId;
+            var 
+            streamData  = [];
 
-          options.message.call(this, streamData, {
-            data: streamData,
-            lastEventId: streamCache[options.label].lastEventId
-          });
-          
+            streamData.push(
+              pluginFns._private.isJson(event.data) ? 
+                JSON.parse(event.data) : 
+                event.data
+            );
+
+
+            streamCache[options.label].lastEventId = event.lastEventId;
+
+            options.message.call(this, streamData[0], {
+              data: streamData,
+              lastEventId: streamCache[options.label].lastEventId
+            });
+          }          
           
           
         }, false);        
       }, 
       openPollingSource: function ( options ) {
-        var source  = $.ajax({
-          type:       'GET',
-          url:        options.url,
-          data:       options.data,
-          beforeSend: function ( data ) {
-            //console.log(data);
-            //options.open.call(this, data);
-          },
-          success: function ( data ) {
+        
+        if ( streamCache[options.label] ) {
+          var source  = $.ajax({
+            type:       'GET',
+            url:        options.url,
+            data:       options.data,
+            beforeSend: function ( data ) {
+              //  TODO - INCOMPLETE
+              //  options.open.call(this, data);
+            },
+            success: function ( data ) {
 
-            //console.log(data);
+              var 
 
-            var 
-            
-            parsedData  = [],
-            streamData  = $.map(  data.split("\n"), function (sdata, i) {
-              if ( sdata ) {
-                return sdata;
-              }
-            });
-            
-            //console.log(streamData);
-            
-            if ( $.isArray(streamData) ) {
-              for ( var i = 0; i < streamData.length; i++ ) {
-                
-                
-                var tempdata  = streamData[i].split(': ')[1];
-                
-                // CONVERT TO PROPER `dataType` HERE
-                if ( options.dataType === 'json' ) {
-                  tempdata  = JSON.parse(tempdata);
+              parsedData  = [],
+              streamData  = $.map(  data.split("\n"), function (sdata, i) {
+                if ( sdata ) {
+                  return sdata;
                 }
+              });
 
-              
-                parsedData.push(tempdata);
+              if ( $.isArray(streamData) ) {
+                for ( var i = 0; i < streamData.length; i++ ) {
+
+
+                  var tempdata  = streamData[i].split(': ')[1];
+
+                  // CONVERT TO PROPER `dataType` HERE
+                  if ( options.dataType === 'json' ) {
+                    tempdata  = JSON.parse(tempdata);
+                  }
+
+
+                  parsedData.push(tempdata);
+                }
               }
-            }
-            
-            streamCache[options.label].lastEventId++;
-            
-            
 
-            options.message.call(this, parsedData, {
-              data: parsedData,
-              lastEventId: streamCache[options.label].lastEventId
-            });
+              streamCache[options.label].lastEventId++;
 
-            
-            setTimeout(
-              function () {
-                pluginSubFn._private.openPollingSource.call(this, options);
-              },
-              500// matches speed of native EventSource
-            );
-            
-          },
-          cache:      false,
-          timeout:    50000,
-          accepts:    options.accepts
-        });
+              options.message.call(this, parsedData[0], {
+                data: parsedData,
+                lastEventId: streamCache[options.label].lastEventId
+              });
 
+
+              setTimeout(
+                function () {
+                  pluginFns._private.openPollingSource.call(this, options);
+                },
+                500// matches speed of native EventSource
+              );
+            },
+            cache:      false,
+            timeout:    50000,
+            accepts:    options.accepts
+          });
+        }
         return source;
       }
     }
@@ -163,10 +161,17 @@
     eventsource: function ( options ) {
       
       var stream, _options;
-      
+
+
       //  PLUGIN sUB FUNCTION
-      if ( options && !$.isPlainObject(options) && pluginSubFn.public[options] ) {
+      if ( options && !$.isPlainObject(options) && pluginFns.public[options] ) {
         
+        //  IF NO LABEL WAS PASSED, SEND MESSAGE TO ALL STREAMS
+        pluginFns.public[options](  
+          arguments[1] ?
+            arguments[1]  :
+            '*'
+        );
         
         return;
       }
@@ -182,15 +187,19 @@
                           options.url + '?' + options.data : 
                           options.label;
       
+      
       //  CREATE NEW OPTIONS OBJECT
       _options        = $.extend({}, streamSrcSettings, options);
       
-
-      stream  = !isNative ? 
-                  pluginSubFn._private.openPollingSource(_options) :
+      //  CREATE EMPTY OBJECT IN `streamCache`
+      streamCache[_options.label] = {};
+      
+      //  DETERMINE AND DECLARE `stream`
+      stream  = !isNative ?
+                  //  IF NOT NATIVE, OPEN A POLLING FALLBACK
+                  pluginFns._private.openPollingSource(_options) :
                   new EventSource(_options.url + ( _options.data ? '?' + _options.data : '' ) );
 
-        
       //  ADD TO EVENT SOURCES
       streamCache[_options.label] = $.extend({}, streamSetup, {
         stream: stream, 
@@ -198,8 +207,9 @@
         options: _options
       });
       
+      
       if ( isNative ) {
-        pluginSubFn._private.openEventSource(_options);
+        pluginFns._private.openEventSource(_options);
       }
       
       return streamCache;
