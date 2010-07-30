@@ -7,18 +7,23 @@ function sizeOf(obj) {
   return length;
 }
 
+var streams;
+
 $(function(){
   
   
   
-  test("$.eventsource", function() {
+  test("$.eventsource is a function", function() {
     
-    var streams;
+    
     
     ok( $.isFunction($.eventsource), "$.eventsource is a function" );
 
-
-
+  });
+  
+  test("$.eventsource callbacks", function() {  
+    
+    stop();
     // PLAIN TEXT EXAMPLE - NO CONTENT TYPE GIVEN
     $.eventsource({
       label:    'text-event-source',
@@ -66,20 +71,40 @@ $(function(){
         
         ok( data, "#3 $.eventsource returns data");
         
+        
         $.eventsource('close', 'json-event-source');
+        
+        
       }
     });
 
-    asyncTest("$.eventsource onmessage tests", function() {
-      setTimeout(function(){
-        start();
-      }, 100);
-    }); 
+    setTimeout(function(){
+      start();
+    }, 500);
+     
+    
+    
+    
   });
   
-
-  test("$.eventsource('streams')", function() {
+  
+  test("$.eventsource('streams') Are Closed", function() {
     
+    stop();
+    
+    equals(sizeOf($.eventsource('streams')), 0, 'there are 0 active streams');
+
+    
+    setTimeout(function(){
+      start();
+    }, 500);
+    
+  });
+  
+  
+
+  test("$.eventsource open/close", function() {
+    stop();
     
 
     $.eventsource({
@@ -95,29 +120,26 @@ $(function(){
         
         ok( data, "#4 $.eventsource returns data");
         
-        streams = $.eventsource('streams');
         
         
-        equals(1, sizeOf($.eventsource('streams')), 'there is only 1 active stream');
+        equals(sizeOf($.eventsource('streams')), 1, 'there is only 1 active stream');
         
             
         
         $.eventsource('close', 'json-event-source-stream');
         
         
-        equals(0, sizeOf($.eventsource('streams')), 'there are 0 active streams');
+        equals(sizeOf($.eventsource('streams')), 0, 'there are 0 active streams');
         
       }
     });
 
-    setTimeout(function(){ 
-      
 
-      start(); 
-      
-      
     
+    setTimeout(function(){ 
+      start(); 
     }, 500);    
+    
   });  
   
 });
