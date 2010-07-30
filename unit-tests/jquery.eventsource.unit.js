@@ -88,7 +88,7 @@ $(function(){
   });
   
   
-  test("$.eventsource('streams') Are Closed", function() {
+  test("$.eventsource streams Are Closed", function() {
     
     stop();
     
