@@ -1,6 +1,10 @@
 # jQuery.EventSource
 
 
+Gives developers the power of the EventSource API across browsers. Uses the EventSource constructor when natively available 
+and falls back to Ajax polling logic when it's not. 
+
+
 ## Usage
 
     $.eventsource({
