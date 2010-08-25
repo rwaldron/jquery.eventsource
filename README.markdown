@@ -11,12 +11,12 @@
 
       //  Set the file to receive data from the server
 
-      url:      'test-event-sources/event-source-1.php',
+      url:      'event-sources/server-event-source.php',
       
       //  Set the type of data you expect to be returned
       //  text, json supported
       
-      data: 'json', 
+      dataType: 'json', 
       
       //  Set a callback to fire when the event source is opened
       //  `onopen`
