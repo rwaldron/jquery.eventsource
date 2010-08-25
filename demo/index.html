@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>yak-yak-face - chat with jquery.eventsource.js</title>
+    <link rel="stylesheet" href="css/main.css" /> 
+    
+    <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" />
+    <script src="http://code.jquery.com/jquery.js"></script> 
+    <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.2/jquery-ui.js"></script>
+    <script src="http://github.com/rwldrn/jquery.eventsource/raw/master/jquery.eventsource.js"></script>
+    <script src="yakyak.js"></script>
+    <script src="http://platform.twitter.com/anywhere.js?id=2HFiAFgUfusZ8PPZQ1ew&amp;v=1">
+    </script>
+    <script type="text/javascript">
+       twttr.anywhere(function(twitter) {
+                twitter.hovercards();
+       });
+    </script>
+    
+  </head>
+<body>
+<div id="container"> 
+  <header> 
+    <h1>Yak-Yak</h1> 
+    <p>
+    <!--
+      Pictocalypse is HTML5: 
+      <a href="http://chrome.google.com">Chrome</a> | 
+      <a href="http://getfirefox.com">Firefox</a> |
+      <a href="http://ie.microsoft.com/testdrive/">IE9</a> | 
+      <a href="#" id="play">Play Slide Show</a>
+      -->
+    </p>      
+  </header> 
+  <section> 
+    <article  class="shadow-box">
+      <ul>
+        
+      </ul>
+    </article>
+ 
+  </section> 
+  <footer class="shadow-box">
+    <form>
+      <input type="text" id="jz-message" value="type message here" autocomplete="off">
+      <button>SEND</button>
+      <input type=submit>
+    </form>  
+  </footer> 
+</div>   
+</body>
+</html>
