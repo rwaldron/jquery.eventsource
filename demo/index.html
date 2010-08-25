@@ -33,7 +33,7 @@
   <footer class="shadow-box">
     <span id="yakyak-form">
       <form>
-        <input type="text" id="jz-message" value="" autocomplete="off">
+        <input type="text" id="yak-message" value="" autocomplete="off">
         <button>SEND</button>
         <input type=submit>
       </form>  
@@ -43,6 +43,7 @@
   
   
   <script>
+    //http://dev.twitter.com/anywhere/begin
     twttr.anywhere(function (T) {
       
       if (T.isConnected()) {
@@ -65,6 +66,7 @@
             
           
             $('#yakyak-form').show();
+            $('#yak-message').trigger('focus');
             $('#twitter-login').hide();
           },
           signOut: function() {

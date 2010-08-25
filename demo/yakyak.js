@@ -41,9 +41,9 @@ $(function () {
   $('form').submit(function (e) {
     e.preventDefault();
     // do an ajax post
-    var messageStr  = $('#jz-message').val();
+    var messageStr  = $('#yak-message').val();
     
-    $('#jz-message').val('');
+    $('#yak-message').val('');
     
     $.ajax({
       url: 'yakyak-messages.php', 
@@ -61,7 +61,7 @@ $(function () {
   
   });
   
-  $('jz-message').trigger('focus');
+  $('#yak-message').trigger('focus');
   
   $('#hint').hide();
   
@@ -70,5 +70,7 @@ $(function () {
   }, function () {
     $('#hint').hide();
   });
+  
+  $('#yakyak-form').hide();
   
 });
