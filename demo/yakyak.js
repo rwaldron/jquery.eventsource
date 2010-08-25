@@ -63,4 +63,12 @@ $(function () {
   
   $('jz-message').trigger('focus');
   
+  $('#hint').hide();
+  
+  $('section,footer').hover(function() {
+    $('#hint').show();
+  }, function () {
+    $('#hint').hide();
+  });
+  
 });
