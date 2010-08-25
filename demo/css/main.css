@@ -32,17 +32,17 @@ margin: -5px 0 0 2px;
 }
 footer {
 vertical-align:top;
-width: 90%;
 position: absolute;
-zIndex: 999; 
-bottom: 15px;
+width: 800px;
+zIndex: 999;
+top:600px;
 }
 input { 
 font-family: monospace;
 font-size:24px;
 padding: 5px 5px 0px 5px;
 margin: 0 0 0 0;
-width: 92%;
+width: 80%;
 }
 button {
 float:right;
@@ -53,7 +53,6 @@ margin: 0 0 0 0;
 
 }
 article {
-width: 90%;
 position:absolute;
 overflow-x:hidden;
 }
@@ -99,4 +98,12 @@ margin:0px;
 li{
 margin:5px;
 display:block;
+clear:both;
+}
+
+img{
+width:30px;
+height:30px;
+float:left;
+margin-right:5px;
 }

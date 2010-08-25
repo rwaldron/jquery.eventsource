@@ -13,21 +13,22 @@ $GLOBALS['YAK']  = array(
 );
 
 
-if ( isset($_POST['jz-message']) ) {
+if ( isset($_POST['yak-message']) ) {
 
   $last = $GLOBALS['YAK']['chat'][sizeof($GLOBALS['YAK']['chat'])-1];
   $temp = new stdClass();
   
   $temp->id        = $last->id+1;
-  $temp->from      = $_POST['jz-from']; 
-  $temp->message   = $_POST['jz-message']; 
+  $temp->from      = $_POST['yak-from']; 
+  $temp->message   = $_POST['yak-message']; 
+  $temp->avatar    = $_POST['yak-avatar']; 
   $temp->timestamp = time(); 
      
   array_push($GLOBALS['YAK']['chat'], $temp);
   
   
   
-  $exp  = explode(' ', $_POST['jz-message']);
+  $exp  = explode(' ', $_POST['yak-message']);
   $test = $exp[0];
 
   if ( in_array($test, $GLOBALS['YAK']['bot']['commands']) )  {
@@ -36,7 +37,8 @@ if ( isset($_POST['jz-message']) ) {
     $bot = new stdClass();
 
     $bot->id        = $last->id+2;
-    $bot->from      = 'bot'; 
+    $bot->from      = 'Ghostbusters'; 
+    $bot->avatar    = 'http://thumbs1.ebaystatic.com/pict/3602347119806464_1.jpg';
     $bot->message   = $GLOBALS['YAK']['bot']['messages'][rand(0, sizeof($GLOBALS['YAK']['bot']['messages']))]->message; 
     $bot->timestamp = time(); 
 

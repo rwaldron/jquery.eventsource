@@ -1,25 +1,16 @@
+var _Twttr  = {};
+
 $(function () {
   
-  var $containersec = $('#container,section'), 
-      $window       = $(window), 
-      $article      = $('article');
+  var $article      = $('article');
   
-
-  $containersec.width(
-    $window.width()
-  );
-
   $article.filter(':first').css({
-    height: '600px',
+    width:  $('#container').width(),
+    height: '500px',
     background: 'white'
   });
 
-  $window.bind('resize', function () {
-    $containersec.width(
-      $window.width()
-    );
-  });
-  
+
   $('input:submit').css({
     display:'none'
   });
@@ -37,14 +28,12 @@ $(function () {
         if ( message.id > dataMessageId ) {
           $('<li/>', {
             'data-message-id': message.id,
-            'text': message.message
+            'html':  ( message.avatar ? '<img src="'+message.avatar+'"> ' : '' ) + message.from + ' : ' + message.message
           }).appendTo('ul');
+          
+          $article.scrollTop($('ul').height());
         }
-        
-        $('article').scrollTop($('article').height());
       });
-      //console.log(data);
-      
       //$.eventsource('close', 'yakyak-messages');
     }
   });
@@ -61,16 +50,16 @@ $(function () {
       type: 'POST',
       dataType: 'json',
       data: $.param({
-                'jz-message'  : messageStr, 
-                'jz-from'     : 'rick'//temp 
+                'yak-message'  : messageStr, 
+                'yak-from'     : _Twttr.screenName,
+                'yak-avatar'   : _Twttr.profileImage
             }), 
       success: function (data) {
-        //console.log(data);
+        //placeholder
       }
     })
   
   });
-  
   
   $('jz-message').trigger('focus');
   

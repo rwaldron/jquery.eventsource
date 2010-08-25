@@ -19,7 +19,6 @@
     //  EXTEND `accepts` OBJECT
     accepts: $.extend({}, $.ajaxSettings.accepts, {
       stream : 'text/event-stream'
-    
     })   
   },
   pluginFns  = {
@@ -167,7 +166,6 @@
       
       var stream, _options;
 
-
       //  PLUGIN sUB FUNCTION
       if ( options && !$.isPlainObject(options) && pluginFns.public[options] ) {
         
@@ -183,8 +181,6 @@
         }
         
         return pluginFns.public[options]();  
-        
-        
       }
     
       
