@@ -58,6 +58,9 @@ $(function(){
         
       }
     });
+    
+    // PLAIN TEXT EXAMPLE - HAS CONTENT TYPE
+
     $.eventsource({
       label:    'json-event-source',
       url:      '../test-event-sources/event-source-2.php',
@@ -74,7 +77,6 @@ $(function(){
         
         $.eventsource('close', 'json-event-source');
         
-        
       }
     });
 
@@ -82,9 +84,6 @@ $(function(){
       start();
     }, 500);
      
-    
-    
-    
   });
   
   
@@ -120,17 +119,11 @@ $(function(){
         
         ok( data, "#4 $.eventsource returns data");
         
-        
-        
         equals(sizeOf($.eventsource('streams')), 1, 'there is only 1 active stream');
-        
-            
         
         $.eventsource('close', 'json-event-source-stream');
         
-        
         equals(sizeOf($.eventsource('streams')), 0, 'there are 0 active streams');
-        
       }
     });
 

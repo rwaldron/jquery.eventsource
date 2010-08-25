@@ -29,8 +29,6 @@
         
         var cache = {};
         
-        console.log(label);
-        
         if ( label !== '*' ) {
           for ( var prop in streamCache ) {
             if ( label  !== prop ) {
@@ -114,11 +112,11 @@
               });
 
               if ( $.isArray(streamData) ) {
+              
                 for ( var i = 0; i < streamData.length; i++ ) {
 
-
-                  var tempdata  = streamData[i].split(': ')[1];
-
+                  var tempdata  = streamData[i].split('data: ')[1];
+                  
                   // CONVERT TO PROPER `dataType` HERE
                   if ( options.dataType === 'json' ) {
                     tempdata  = JSON.parse(tempdata);
