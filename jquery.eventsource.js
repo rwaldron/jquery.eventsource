@@ -110,17 +110,21 @@
                 
                 
                 this['label'] = options.label;
-                options.open.call(this);
+                streamCache[options.label].options.open.call(this);
               }   
             },
             success: function ( data ) {
+            
+              if ( data.indexOf('data: ') === -1 ) {
+                return false;
+              }
 
               var parsedData  = [],
                   streamData  = $.map(  data.split("\n"), function (sdata, i) {
-                    if ( sdata ) {
-                      return sdata;
-                    }
-                  });
+                                  if ( sdata ) {
+                                    return sdata;
+                                  }
+                                });
 
               if ( $.isArray(streamData) ) {
               
@@ -143,7 +147,7 @@
                 
                 this['label'] = options.label;
                 
-                options.message.call(this, parsedData[0] ? parsedData[0] : null, {
+                streamCache[options.label].options.message.call(this, parsedData[0] ? parsedData[0] : null, {
                   data: parsedData,
                   lastEventId: streamCache[options.label].lastEventId
                 });
@@ -219,7 +223,10 @@
       _options        = $.extend({}, streamSrcSettings, options);
       
       //  CREATE EMPTY OBJECT IN `streamCache`
-      streamCache[_options.label] = {};
+      streamCache[_options.label] = {
+        options: _options
+      };
+      
       
       //  DETERMINE AND DECLARE `stream`
       stream  = !isNative ?
