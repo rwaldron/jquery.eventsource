@@ -17,11 +17,31 @@ $(function () {
   $('input:submit').css({
     display:'none'
   });
-  
 
+  $.eventsource({
+    label:    'yakyak-currentusers',
+    url:      'yakyak-currentusers.php',
+    dataType: 'json',
+    message:  function (data) {
+    
+      if ( data ) {
+        // this is stupid, change to check if exists
+        //$('ul#yak-currentusers-ul').empty();
 
+        $.each(data, function (i, user) {
+          
+          if ( !$('[data-id="'+user.id+'"]').length ) {
+            $('<li/>', {
+              'data-id': user.id,
+              'html':  '<img src="'+user.avatar+'"> ' + user.screenName
+            }).appendTo('ul#yak-currentusers-ul');
+          }
+        });
+        //$.eventsource('close', 'yakyak-currentusers');
+      }        
+    }
+  });    
 
-  
   $.eventsource({
     label:    'yakyak-messages',
     url:      'yakyak-messages.php',
@@ -66,32 +86,6 @@ $(function () {
     })
   });
   
-  
-  $.eventsource({
-    label:    'yakyak-currentusers',
-    url:      'yakyak-currentusers.php',
-    dataType: 'json',
-    message:  function (data) {
-    
-      if ( data ) {
-        // this is stupid, change to check if exists
-        //$('ul#yak-currentusers-ul').empty();
-
-        $.each(data, function (i, user) {
-          
-          if ( !$('[data-id="'+user.id+'"]').length ) {
-            $('<li/>', {
-              'data-id': user.id,
-              'html':  '<img src="'+user.avatar+'"> ' + user.screenName
-            }).appendTo('ul#yak-currentusers-ul');
-          }
-        });
-        //$.eventsource('close', 'yakyak-currentusers');
-      }        
-    }
-  });  
-  
-  $('#yak-message').trigger('focus');
   
   $('#hint').hide();
   
