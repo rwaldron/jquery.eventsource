@@ -120,4 +120,22 @@ and falls back to Ajax polling logic when it's not.
     });     
     
     
+## Server Source Requirements
+    
+    //  Server response MUST be Content-Type: text/event-stream
+    //  Server response MUST be prepended with 'data: '
+
+    
+    // Examples:
+    
+    //  PHP
+    header("Content-Type: text/event-stream\n\n");
+    echo 'data: this is a valid response';
+    
+    
+    //  Python
+    print "Content-Type: text/event-stream"
+    print "data: this is a valid response"
+
+    
     

@@ -14,11 +14,7 @@ $(function(){
   
   
   test("$.eventsource is a function", function() {
-    
-    
-    
     ok( $.isFunction($.eventsource), "$.eventsource is a function" );
-
   });
   
   test("$.eventsource callbacks", function() {  
@@ -54,8 +50,6 @@ $(function(){
         ok( data, "#2 $.eventsource returns data");
         
         $.eventsource('close', 'text-event-source-ct');
-
-        
       }
     });
     
@@ -73,17 +67,14 @@ $(function(){
         ok( true, "#3 $.eventsource fires onmessage callback" );
         
         ok( data, "#3 $.eventsource returns data");
-        
-        
+
         $.eventsource('close', 'json-event-source');
-        
       }
     });
 
     setTimeout(function(){
       start();
     }, 500);
-     
   });
   
   
@@ -93,7 +84,6 @@ $(function(){
     
     equals(sizeOf($.eventsource('streams')), 0, 'there are 0 active streams');
 
-    
     setTimeout(function(){
       start();
     }, 500);
@@ -105,7 +95,6 @@ $(function(){
   test("$.eventsource open/close", function() {
     stop();
     
-
     $.eventsource({
       label:    'json-event-source-stream',
       url:      '../test-event-sources/event-source-2.php',
