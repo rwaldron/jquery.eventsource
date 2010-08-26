@@ -46,7 +46,7 @@ $(function () {
   
   $('form').submit(function (e) {
     e.preventDefault();
-    // do an ajax post
+    
     var messageStr  = $('#yak-message').val();
     
     $('#yak-message').val('');
@@ -75,14 +75,16 @@ $(function () {
     
       if ( data ) {
         // this is stupid, change to check if exists
-        $('ul#yak-currentusers-ul').empty();
+        //$('ul#yak-currentusers-ul').empty();
 
         $.each(data, function (i, user) {
-        
-          $('<li/>', {
-            'data-id': user.id,
-            'html':  '<img src="'+user.avatar+'"> ' + user.screenName
-          }).appendTo('ul#yak-currentusers-ul');
+          
+          if ( !$('[data-id="'+user.id+'"]').length ) {
+            $('<li/>', {
+              'data-id': user.id,
+              'html':  '<img src="'+user.avatar+'"> ' + user.screenName
+            }).appendTo('ul#yak-currentusers-ul');
+          }
         });
         //$.eventsource('close', 'yakyak-currentusers');
       }        
