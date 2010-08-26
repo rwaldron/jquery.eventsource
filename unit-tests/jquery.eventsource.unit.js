@@ -125,7 +125,7 @@ $(function(){
   });  
 
 
-  test("$.eventsource - multiple concurrent sources", function() {
+  test("$.eventsource - multiple concurrent sources - scope tests", function() {
     stop();
     
     $.eventsource({
@@ -133,11 +133,12 @@ $(function(){
       url:      '../test-event-sources/event-source-2.php',
       dataType: 'json',
       open:  function () {
-        console.log(this);
+        
         ok( true, "event-source-1 fires onopen callback" );
       },
       message:  function (data) {
-        console.log(this);
+        
+        equals(this.label, 'event-source-1', 'Correct EventSource returned, looking for `event-source-1`');
         ok( true, "event-source-1 fires onmessage callback" );
       }
     });
@@ -147,11 +148,12 @@ $(function(){
       url:      '../test-event-sources/event-source-2.php',
       dataType: 'json',
       open:  function () {
-        console.log(this);
+        
         ok( true, "event-source-2 fires onopen callback" );
       },
       message:  function (data) {
-        console.log(this);
+        
+        equals(this.label, 'event-source-2', 'Correct EventSource returned, looking for `event-source-2`');
         ok( true, "event-source-2 fires onmessage callback" );
       }
     });
@@ -161,34 +163,170 @@ $(function(){
       url:      '../test-event-sources/event-source-2.php',
       dataType: 'json',
       open:  function () {
-        console.log(this);
         ok( true, "event-source-3 fires onopen callback" );
       },
       message:  function (data) {
         
         
-        
-        console.log(arguments);
-        //console.log(this);
+        equals(this.label, 'event-source-3', 'Correct EventSource returned, looking for `event-source-3`');
         ok( true, "event-source-3 fires onmessage callback" );
       }
-    });    
+    });   
+
+
+    setTimeout(function(){ 
+      start(); 
+    }, 500);       
+  });  
+  
+  
+  
+  test("$.eventsource - multiple concurrent sources - scope tests: closing sources one at a time", function() {
+    stop();
+    
+    
+    setTimeout(function() {
+      equals(sizeOf($.eventsource('close', 'event-source-1')), 2, 'Closing `event-source-1`, 2 event sources remaining');
+      start();
+    }, 200);      
+
+
+  
+    setTimeout(function() {
+      equals(1, sizeOf($.eventsource('close', 'event-source-2')), 'Closing `event-source-2`, 1 event sources remaining ');
+      start();
+    }, 300);      
+
+    
+    setTimeout(function() {
+      equals(0, sizeOf($.eventsource('close', 'event-source-3')), 'Closing `event-source-3`, 0 event sources remaining');
+      start();
+    }, 400);      
 
 
     
     setTimeout(function(){ 
-      start(); 
-
-      $.eventsource('close', 'event-source-1');
-      $.eventsource('close', 'event-source-2');
-      $.eventsource('close', 'event-source-3');
-    }, 500);    
-    
-    
-    
-
-    
-  });  
-    
+       
+      equals(0, sizeOf($.eventsource('streams')), 'All Event Sources closed');
+      start();
+    }, 500);  
+  });    
   
+
+  test("$.eventsource - breakage tests", function() {
+
+    try {
+      $.eventsource({});    
+      
+    } catch(err)  {
+      ok(true, 'Caught the error thrown by the instance not having any options set');
+    }        
+    
+    try {
+      $.eventsource({
+        open:  function () {},
+        message:  function (data) {}
+      });       
+    } catch(err)  {
+      ok(true, 'Caught the error thrown by the instance not being provided a url');
+    }    
+
+    try {
+      $.eventsource({
+        url: null,
+        open:  function () {},
+        message:  function (data) {}
+      });       
+    } catch(err)  {
+      ok(true, 'Caught the error thrown by the instance options.url being `null`');
+    }    
+
+
+    try {
+      $.eventsource({
+        url: undefined,
+        open:  function () {},
+        message:  function (data) {}
+      });       
+    } catch(err)  {
+      ok(true, 'Caught the error thrown by the instance options.url being `undefined`');
+    }    
+
+
+    try {
+      $.eventsource({
+        url: '',
+        open:  function () {},
+        message:  function (data) {}
+      });       
+    } catch(err)  {
+      ok(true, 'Caught the error thrown by the instance options.url being an empty string');
+    }    
+
+
+    try {
+      $.eventsource({
+        url: false,
+        open:  function () {},
+        message:  function (data) {}
+      });       
+    } catch(err)  {
+      ok(true, 'Caught the error thrown by the instance options.url being `false`');
+    }    
+
+
+    try {
+      $.eventsource({
+        url: true,
+        open:  function () {},
+        message:  function (data) {}
+      });       
+    } catch(err)  {
+      ok(true, 'Caught the error thrown by the instance options.url being `true`');
+    }    
+
+    
+    
+    // this will error, but not testing?
+    $.eventsource({
+      label:    'event-source-3',
+      url:      '../test-event-sources/event-source-10.php',
+      dataType: 'json',
+      open:  function () {},
+      message:  function (data) {}
+    });   
+        
+    
+
+  });    
 });
+
+
+
+  
+test("$.eventsource incorrect server response prefix", function() {  
+  stop();
+  
+  var isignored = true, 
+      isopened  = false;
+  
+  $.eventsource({
+    label:    'text-event-source',
+    url:      '../test-event-sources/event-source-5.php',
+    open:  function () {
+      isopened  = true;
+    },
+    message:  function (data) {
+      isignored = false;
+    }
+  });
+
+
+  setTimeout(function(){
+    ok(isopened, 'We successfully opened the event source');
+    ok(isignored, 'However, server responses missing the response prefix will be ignored');
+    
+    start();
+  }, 2000);
+});
+

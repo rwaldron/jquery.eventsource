@@ -119,6 +119,12 @@ and falls back to Ajax polling logic when it's not.
       }
     });     
     
+
+## Accessing your current event sources:
+    
+    //  Returns an object containing all the currently active eventsource streams
+    $.eventsource('streams')
+
     
 ## Server Source Requirements
     
@@ -139,3 +145,10 @@ and falls back to Ajax polling logic when it's not.
 
     
     
+
+
+
+
+
+
+

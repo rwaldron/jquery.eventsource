@@ -37,6 +37,8 @@
         }
         
         streamCache = cache;
+        
+        return streamCache;
       }, 
       streams: function () {
         return streamCache;
@@ -94,14 +96,21 @@
       }, 
       openPollingSource: function ( options ) {
         
+        
+        
+        
         if ( streamCache[options.label] ) {
+        
           var source  = $.ajax({
             type:       'GET',
             url:        options.url,
             data:       options.data,
             beforeSend: function () {
               if ( streamCache[options.label] ) {
-                streamCache[options.label].options.open.call(this);
+                
+                
+                this['label'] = options.label;
+                options.open.call(this);
               }   
             },
             success: function ( data ) {
@@ -132,7 +141,9 @@
               if ( streamCache[options.label] ) {
                 streamCache[options.label].lastEventId++;
                 
-                streamCache[options.label].options.message.call(this, parsedData[0] ? parsedData[0] : null, {
+                this['label'] = options.label;
+                
+                options.message.call(this, parsedData[0] ? parsedData[0] : null, {
                   data: parsedData,
                   lastEventId: streamCache[options.label].lastEventId
                 });
@@ -176,13 +187,11 @@
         
         //  IF NO LABEL WAS PASSED, SEND MESSAGE TO ALL STREAMS
         if ( options === 'close' ) {
-          pluginFns.public[options](  
-            arguments[1] ?
-              arguments[1]  :
-              '*'
-          );
-          
-          return;
+          return pluginFns.public[options](  
+                    arguments[1] ?
+                      arguments[1]  :
+                      '*'
+                  );
         }
         
         return pluginFns.public[options]();  
@@ -193,6 +202,12 @@
       options.data    = options.data && $.isPlainObject(options.data) ? 
                           $.param(options.data) : 
                           options.data;      
+      
+      //  Mimick the native behavior?
+      if ( !options.url || typeof options.url !== 'string'  ) {
+        throw new SyntaxError('Not enough arguments: Must provide a url');
+      }
+      
       
       //  IF NO EXPLICIT LABEL, SET INTERNAL LABEL
       options.label   = !options.label ? 
