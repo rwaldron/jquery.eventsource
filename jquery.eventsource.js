@@ -57,7 +57,10 @@
            
         streamCache[options.label].stream.addEventListener('open', function (event) {
           if ( streamCache[options.label] ) {
-            options.open.call(this);
+          
+            this['label']  = options.label;
+            
+            streamCache[options.label].options.open.call(this, event);
           }   
         }, false);
 
@@ -66,22 +69,24 @@
           
           if ( streamCache[options.label] ) {
           
-            var 
-            streamData  = [];
+            var streamData  = [];
 
-            streamData.push(
-              pluginFns._private.isJson(event.data) ? 
-                JSON.parse(event.data) : 
-                event.data
-            );
+                streamData.push(
+                  pluginFns._private.isJson(event.data) ? 
+                    JSON.parse(event.data) : 
+                    event.data
+                );
 
 
             streamCache[options.label].lastEventId = event.lastEventId;
-
-            options.message.call(this, streamData[0] ? streamData[0] : null, {
+            
+            
+            this['label']  = options.label;
+            
+            streamCache[options.label].options.message.call(this, streamData[0] ? streamData[0] : null, {
               data: streamData,
               lastEventId: streamCache[options.label].lastEventId
-            });
+            }, event);
           }          
           
           
@@ -96,19 +101,17 @@
             data:       options.data,
             beforeSend: function () {
               if ( streamCache[options.label] ) {
-                options.open.call(this);
+                streamCache[options.label].options.open.call(this);
               }   
             },
             success: function ( data ) {
 
-              var 
-
-              parsedData  = [],
-              streamData  = $.map(  data.split("\n"), function (sdata, i) {
-                if ( sdata ) {
-                  return sdata;
-                }
-              });
+              var parsedData  = [],
+                  streamData  = $.map(  data.split("\n"), function (sdata, i) {
+                    if ( sdata ) {
+                      return sdata;
+                    }
+                  });
 
               if ( $.isArray(streamData) ) {
               

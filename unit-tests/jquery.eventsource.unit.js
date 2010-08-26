@@ -123,5 +123,72 @@ $(function(){
     }, 500);    
     
   });  
+
+
+  test("$.eventsource - multiple concurrent sources", function() {
+    stop();
+    
+    $.eventsource({
+      label:    'event-source-1',
+      url:      '../test-event-sources/event-source-2.php',
+      dataType: 'json',
+      open:  function () {
+        console.log(this);
+        ok( true, "event-source-1 fires onopen callback" );
+      },
+      message:  function (data) {
+        console.log(this);
+        ok( true, "event-source-1 fires onmessage callback" );
+      }
+    });
+    
+    $.eventsource({
+      label:    'event-source-2',
+      url:      '../test-event-sources/event-source-2.php',
+      dataType: 'json',
+      open:  function () {
+        console.log(this);
+        ok( true, "event-source-2 fires onopen callback" );
+      },
+      message:  function (data) {
+        console.log(this);
+        ok( true, "event-source-2 fires onmessage callback" );
+      }
+    });
+
+    $.eventsource({
+      label:    'event-source-3',
+      url:      '../test-event-sources/event-source-2.php',
+      dataType: 'json',
+      open:  function () {
+        console.log(this);
+        ok( true, "event-source-3 fires onopen callback" );
+      },
+      message:  function (data) {
+        
+        
+        
+        console.log(arguments);
+        //console.log(this);
+        ok( true, "event-source-3 fires onmessage callback" );
+      }
+    });    
+
+
+    
+    setTimeout(function(){ 
+      start(); 
+
+      $.eventsource('close', 'event-source-1');
+      $.eventsource('close', 'event-source-2');
+      $.eventsource('close', 'event-source-3');
+    }, 500);    
+    
+    
+    
+
+    
+  });  
+    
   
 });
