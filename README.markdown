@@ -6,7 +6,9 @@ and falls back to Ajax polling logic when it's not.
 
 
 ## Provides cross browser implementation for:
-http://dev.w3.org/html5/eventsource/
+
+[http://dev.w3.org/html5/eventsource/](http://dev.w3.org/html5/eventsource/)
+
 
 
 
