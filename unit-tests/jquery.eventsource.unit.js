@@ -32,7 +32,7 @@ $(function(){
         
         ok( data, "#1 $.eventsource returns data");
         
-        $.eventsource('close', 'text-event-source');
+        ok( typeof $.eventsource('close', 'text-event-source') === 'object', '$.eventsource("close", "text-event-source") must return an object' );        
       }
     });
 
@@ -49,7 +49,7 @@ $(function(){
         
         ok( data, "#2 $.eventsource returns data");
         
-        $.eventsource('close', 'text-event-source-ct');
+        ok( typeof $.eventsource('close', 'text-event-source-ct') === 'object', '$.eventsource("close", "text-event-source-ct") must return an object' );        
       }
     });
     
@@ -68,7 +68,7 @@ $(function(){
         
         ok( data, "#3 $.eventsource returns data");
 
-        $.eventsource('close', 'json-event-source');
+        ok( typeof $.eventsource('close', 'json-event-source') === 'object', '$.eventsource("close", "json-event-source") must return an object' );        
       }
     });
 
@@ -83,6 +83,9 @@ $(function(){
     stop();
     
     equals(sizeOf($.eventsource('streams')), 0, 'there are 0 active streams');
+    
+    ok( typeof $.eventsource('streams') === 'object', '$.eventsource("streams") must return an object' );        
+
 
     setTimeout(function(){
       start();
@@ -110,7 +113,7 @@ $(function(){
         
         equals(sizeOf($.eventsource('streams')), 1, 'there is only 1 active stream');
         
-        $.eventsource('close', 'json-event-source-stream');
+        ok( typeof $.eventsource('close', 'json-event-source-stream') === 'object', '$.eventsource("close", "json-event-source-stream") must return an object' );        
         
         equals(sizeOf($.eventsource('streams')), 0, 'there are 0 active streams');
       }
@@ -304,7 +307,7 @@ $(function(){
 
 
   
-test("$.eventsource incorrect server response prefix", function() {  
+test("$.eventsource ignores incorrect server response prefix", function() {  
   stop();
   
   var isignored = true, 
@@ -323,10 +326,93 @@ test("$.eventsource incorrect server response prefix", function() {
 
 
   setTimeout(function(){
-    ok(isopened, 'We successfully opened the event source');
+    
+    /*
+    var stream  = $.eventsource('stream', 'text-event-source');
+    
+    if ( !stream.isNative ) {
+      ok(isopened, 'open the event source');
+    } else {
+      ok(!isopened, 'open the event source');
+    }
+    */
+    
     ok(isignored, 'However, server responses missing the response prefix will be ignored');
     
     start();
   }, 2000);
+  
+  
+  
+  
+  ok( typeof $.eventsource('close', 'text-event-source') === 'object', '$.eventsource("close") must return an object' );
 });
 
+
+
+test("$.eventsource streams object", function() {  
+  
+  stop();
+  
+  setTimeout(function(){
+    // labeled stream
+    $.eventsource({
+      label:    'labeled-stream',
+      url:      '../test-event-sources/event-source-1.php',
+      open:  function () {
+      },
+      message:  function (data) {
+      }
+    });
+
+    // unlabeled stream
+    $.eventsource({
+      url:      '../test-event-sources/event-source-2.php',
+      open:  function () {
+      },
+      message:  function (data) {
+      }
+    });
+  
+  
+    var streamsObj  = $.eventsource('streams');
+    
+    ok( typeof streamsObj === 'object', '$.eventsource("streams") must return an object' );
+    
+    
+    $.each(streamsObj, function (i, obj) {
+
+      ok( typeof obj.isNative === 'boolean', 'Stream.options.isNative exists and is a boolean value' );
+
+      ok( typeof obj.lastEventId === 'number', 'Stream.options.isNative exists and is a boolean value' );
+    
+      ok( obj.options.label && obj.options.label !== '', 'Stream.options.label exists and not an empty string' );
+
+      ok( obj.options.message && $.isFunction(obj.options.message), 'Stream.options.message exists and is a function' );
+
+      ok( obj.options.open && $.isFunction(obj.options.open), 'Stream.options.message exists and is a function' );
+      
+      
+      if ( obj.isNative ) {
+        ok( (obj.stream.toString() === '[object EventSource]'), 'Native Streams are [object EventSource]'  );
+      } 
+      
+      if ( !obj.isNative ) {
+        if ( window.XMLHttpRequest ) {
+          ok( (obj.stream.toString() === '[object XMLHttpRequest]'), 'Non-Native Streams are [object XMLHttpRequest]'  );
+        }
+        else {
+          ok( true, 'Missing IE Stream type test!!'  );
+        }
+      }
+    
+    });
+    
+    ok( typeof $.eventsource('close') === 'object', '$.eventsource("close") must return an object' );
+    
+    ok( typeof $.eventsource('streams') === 'object', '$.eventsource("streams") must return an object' );
+    
+    start();
+
+  }, 5000);
+});
