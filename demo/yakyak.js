@@ -1,8 +1,11 @@
-var _Twttr  = {};
+var Yak  = {
+  Twttr: {}
+};
 
 $(function () {
   
-  var $article      = $('article');
+  var $article      = $('article'), 
+      $footer       = $('footer');
   
   $article.filter(':first').css({
     width:  $('#container').width(),
@@ -15,6 +18,9 @@ $(function () {
     display:'none'
   });
   
+
+
+
   
   $.eventsource({
     label:    'yakyak-messages',
@@ -29,7 +35,7 @@ $(function () {
           $('<li/>', {
             'data-message-id': message.id,
             'html':  ( message.avatar ? '<img src="'+message.avatar+'"> ' : '' ) + message.from + ' : ' + message.message
-          }).appendTo('ul');
+          }).appendTo('ul#yak-messages-ul');
           
           $article.scrollTop($('ul').height());
         }
@@ -51,15 +57,39 @@ $(function () {
       dataType: 'json',
       data: $.param({
                 'yak-message'  : messageStr, 
-                'yak-from'     : _Twttr.screenName,
-                'yak-avatar'   : _Twttr.profileImage
+                'yak-from'     : Yak.Twttr.screenName,
+                'yak-avatar'   : Yak.Twttr.profileImage
             }), 
       success: function (data) {
         //placeholder
       }
     })
-  
   });
+  
+  
+  $.eventsource({
+    label:    'yakyak-currentusers',
+    url:      'yakyak-currentusers.php',
+    dataType: 'json',
+    message:  function (data) {
+    
+      if ( data ) {
+        // this is stupid, change to check if exists
+        $('ul#yak-currentusers-ul').empty();
+
+        $.each(data, function (i, user) {
+        
+          console.log(user);
+          
+          $('<li/>', {
+            'data-id': user.id,
+            'html':  '<img src="'+user.avatar+'"> ' + user.screenName
+          }).appendTo('ul#yak-currentusers-ul');
+        });
+        //$.eventsource('close', 'yakyak-currentusers');
+      }        
+    }
+  });  
   
   $('#yak-message').trigger('focus');
   
@@ -71,6 +101,8 @@ $(function () {
     $('#hint').hide();
   });
   
-  $('footer').hide();
+  $footer.css({
+    opacity: 0
+  });
   
 });

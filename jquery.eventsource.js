@@ -128,8 +128,8 @@
               
               if ( streamCache[options.label] ) {
                 streamCache[options.label].lastEventId++;
-
-                options.message.call(this, parsedData[0] ? parsedData[0] : null, {
+                
+                streamCache[options.label].options.message.call(this, parsedData[0] ? parsedData[0] : null, {
                   data: parsedData,
                   lastEventId: streamCache[options.label].lastEventId
                 });

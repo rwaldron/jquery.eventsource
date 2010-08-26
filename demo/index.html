@@ -4,7 +4,7 @@
     <title>yak-yak-face - chat with jquery.eventsource.js</title>
     
     
-    <link rel="stylesheet" href="http://github.com/joshuaclayton/blueprint-css/raw/master/blueprint/screen.css" />
+
     <link rel="stylesheet" href="/jquery-ui-1.9m2/themes/base/jquery.ui.all.css" />
     <link rel="stylesheet" href="yakyak.css" /> 
     
@@ -27,21 +27,22 @@
     
   </head>
 <body>
+<ul id="yak-currentusers-ul">
+
+</ul>
 <div id="container"> 
+  <div id="twitter-connect-placeholder"></div>
+  
+
   <header> 
     <h1>Yak-Yak</h1> 
     <p>
-    <a href="http://github.com/rwldrn/jquery.eventsource">Source Available At Github</a> 
-    
-    
-    <span id="twitter-connect-placeholder"></span>
-    <span id="hint">Hint: type ?gb</span>
+      <a href="http://github.com/rwldrn/jquery.eventsource">Source Available At Github</a> 
     </p>      
-    
   </header>
   <section> 
     <article  class="shadow-box">
-      <ul>
+      <ul id="yak-messages-ul">
         
       </ul>
     </article>
@@ -56,7 +57,7 @@
       </form>  
     </span>    
   </footer> 
-  
+
   
   <script src="yakyak-twitter.js"></script>
   
