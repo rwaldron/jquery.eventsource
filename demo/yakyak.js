@@ -17,6 +17,47 @@ $(function () {
   $('input:submit').css({
     display:'none'
   });
+  
+  $('#hint').hide();
+  
+  $('section,footer').hover(function() {
+    $('#hint').show();
+  }, function () {
+    $('#hint').hide();
+  });
+  
+  $footer.css({
+    opacity: 0
+  });
+  
+  
+  $.eventsource({
+    label:    'yakyak-messages',
+    url:      'yakyak-messages.php',
+    dataType: 'json',
+    message:  function (data) {
+      
+      var dataMessageId = $('li').length ? $('li:last').attr('data-message-id') : 0 ;
+      
+      $.each(data, function (i, message) {
+        if ( message.id > dataMessageId ) {
+          
+          var _ts = new Date(message.timestamp * 1000);
+          
+          $('<li/>', {
+            'data-message-id': message.id,
+            'title': _ts.toString(),
+            'html':  ( message.avatar ? '<img src="'+message.avatar+'"> ' : '' ) + message.from + ' : ' + message.message
+          }).appendTo('ul#yak-messages-ul');
+          
+          $article.scrollTop($('ul#yak-messages-ul').height());
+        }
+      });
+      //$.eventsource('close', 'yakyak-messages');
+    }
+  });
+
+
 
   $.eventsource({
     label:    'yakyak-currentusers',
@@ -40,29 +81,7 @@ $(function () {
         //$.eventsource('close', 'yakyak-currentusers');
       }        
     }
-  });    
-
-  $.eventsource({
-    label:    'yakyak-messages',
-    url:      'yakyak-messages.php',
-    dataType: 'json',
-    message:  function (data) {
-      
-      var dataMessageId = $('li').length ? $('li:last').attr('data-message-id') : 0 ;
-      
-      $.each(data, function (i, message) {
-        if ( message.id > dataMessageId ) {
-          $('<li/>', {
-            'data-message-id': message.id,
-            'html':  ( message.avatar ? '<img src="'+message.avatar+'"> ' : '' ) + message.from + ' : ' + message.message
-          }).appendTo('ul#yak-messages-ul');
-          
-          $article.scrollTop($('ul#yak-messages-ul').height());
-        }
-      });
-      //$.eventsource('close', 'yakyak-messages');
-    }
-  });
+  });     
   
   $('form').submit(function (e) {
     e.preventDefault();
@@ -86,17 +105,5 @@ $(function () {
     })
   });
   
-  
-  $('#hint').hide();
-  
-  $('section,footer').hover(function() {
-    $('#hint').show();
-  }, function () {
-    $('#hint').hide();
-  });
-  
-  $footer.css({
-    opacity: 0
-  });
-  
+
 });
