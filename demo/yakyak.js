@@ -37,7 +37,7 @@ $(function () {
             'html':  ( message.avatar ? '<img src="'+message.avatar+'"> ' : '' ) + message.from + ' : ' + message.message
           }).appendTo('ul#yak-messages-ul');
           
-          $article.scrollTop($('ul').height());
+          $article.scrollTop($('ul#yak-messages-ul').height());
         }
       });
       //$.eventsource('close', 'yakyak-messages');
@@ -79,8 +79,6 @@ $(function () {
 
         $.each(data, function (i, user) {
         
-          console.log(user);
-          
           $('<li/>', {
             'data-id': user.id,
             'html':  '<img src="'+user.avatar+'"> ' + user.screenName
