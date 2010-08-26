@@ -125,21 +125,23 @@
                   parsedData.push(tempdata);
                 }
               }
+              
+              if ( streamCache[options.label] ) {
+                streamCache[options.label].lastEventId++;
 
-              streamCache[options.label].lastEventId++;
-
-              options.message.call(this, parsedData[0] ? parsedData[0] : null, {
-                data: parsedData,
-                lastEventId: streamCache[options.label].lastEventId
-              });
+                options.message.call(this, parsedData[0] ? parsedData[0] : null, {
+                  data: parsedData,
+                  lastEventId: streamCache[options.label].lastEventId
+                });
 
 
-              setTimeout(
-                function () {
-                  pluginFns._private.openPollingSource.call(this, options);
-                },
-                500// matches speed of native EventSource
-              );
+                setTimeout(
+                  function () {
+                    pluginFns._private.openPollingSource.call(this, options);
+                  },
+                  500// matches speed of native EventSource
+                );
+              }                
             },
             cache:      false,
             timeout:    50000,

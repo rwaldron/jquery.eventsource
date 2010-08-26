@@ -97,6 +97,7 @@ margin:0px;
 }
 li{
 margin:5px;
+padding:5px 0;
 display:block;
 clear:both;
 }
@@ -108,5 +109,9 @@ float:left;
 margin-right:5px;
 }
 #hint{
+float:right;
+}
+
+#twitter-connect-placeholder{
 float:right;
 }

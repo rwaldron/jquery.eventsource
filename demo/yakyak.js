@@ -71,6 +71,6 @@ $(function () {
     $('#hint').hide();
   });
   
-  $('#yakyak-form').hide();
+  $('footer').hide();
   
 });

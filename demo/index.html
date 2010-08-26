@@ -2,11 +2,24 @@
 <html>
   <head>
     <title>yak-yak-face - chat with jquery.eventsource.js</title>
-    <link rel="stylesheet" href="css/main.css" /> 
     
+    
+    <link rel="stylesheet" href="http://github.com/joshuaclayton/blueprint-css/raw/master/blueprint/screen.css" />
+    <link rel="stylesheet" href="/jquery-ui-1.9m2/themes/base/jquery.ui.all.css" />
+    <link rel="stylesheet" href="yakyak.css" /> 
+    
+    
+    <script src="/jquery-ui-1.9m2/jquery-1.4.2.js"></script>
+    <script src="/jquery-ui-1.9m2/ui/jquery.ui.core.js"></script>
+    <script src="/jquery-ui-1.9m2/ui/jquery.ui.widget.js"></script>
+    <script src="/jquery-ui-1.9m2/ui/jquery.ui.position.js"></script>
+    <script src="/jquery-ui-1.9m2/ui/jquery.ui.tooltip.js"></script>
+    
+    <!--
     <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" />
     <script src="http://code.jquery.com/jquery.js"></script> 
     <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.2/jquery-ui.js"></script>
+    -->
     <script src="http://platform.twitter.com/anywhere.js?id=2HFiAFgUfusZ8PPZQ1ew&amp;v=1"></script>
     <script src="http://github.com/rwldrn/jquery.eventsource/raw/master/jquery.eventsource.js"></script>
     <script src="yakyak.js"></script>
@@ -19,9 +32,13 @@
     <h1>Yak-Yak</h1> 
     <p>
     <a href="http://github.com/rwldrn/jquery.eventsource">Source Available At Github</a> 
+    
+    
+    <span id="twitter-connect-placeholder"></span>
     <span id="hint">Hint: type ?gb</span>
     </p>      
-  </header> 
+    
+  </header>
   <section> 
     <article  class="shadow-box">
       <ul>
@@ -33,50 +50,15 @@
   <footer class="shadow-box">
     <span id="yakyak-form">
       <form>
-        <input type="text" id="yak-message" value="" autocomplete="off">
+        <input type="text" id="yak-message" value="" autocomplete="off" title="hint: Try typing '?gb'">
         <button>SEND</button>
         <input type=submit>
       </form>  
     </span>    
-    <span id="twitter-login"></span>
   </footer> 
   
   
-  <script>
-    //http://dev.twitter.com/anywhere/begin
-    twttr.anywhere(function (T) {
-      
-      if (T.isConnected()) {
-        
-        $('#yakyak-form').show();
-        $('#twitter-login').hide();
-        
-        _Twttr.currentUser     = T.currentUser;
-        _Twttr.screenName      = _Twttr.currentUser.data('screen_name');
-        _Twttr.profileImage    = _Twttr.currentUser.data('profile_image_url');
-        
-        
-      } else {
-        T("#twitter-login").connectButton({
-          authComplete: function(user) {
-          
-            _Twttr.currentUser     = T.currentUser;
-            _Twttr.screenName      = _Twttr.currentUser.data('screen_name');
-            _Twttr.profileImage    = _Twttr.currentUser.data('profile_image_url');
-            
-          
-            $('#yakyak-form').show();
-            $('#yak-message').trigger('focus');
-            $('#twitter-login').hide();
-          },
-          signOut: function() {
-            $('#yakyak-form').show();
-            $('#twitter-login').show();
-          }
-        });    
-      }
-    });
-  </script>
+  <script src="yakyak-twitter.js"></script>
   
   
 </div>   

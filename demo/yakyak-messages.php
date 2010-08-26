@@ -14,6 +14,11 @@ $GLOBALS['YAK']  = array(
 
 
 if ( isset($_POST['yak-message']) ) {
+  
+  foreach($_POST as $k => $v ) {
+    $_POST[$k]  = htmlentities($v);
+  }
+
 
   $last = $GLOBALS['YAK']['chat'][sizeof($GLOBALS['YAK']['chat'])-1];
   $temp = new stdClass();
