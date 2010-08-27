@@ -5,6 +5,10 @@ Gives developers the power of the EventSource API across browsers. Uses the Even
 and falls back to Ajax polling logic when it's not. 
 
 
+[http://wiki.github.com/rwldrn/jquery.eventsource/](http://wiki.github.com/rwldrn/jquery.eventsource/)
+
+
+
 ## Provides cross browser implementation for:
 
 [http://dev.w3.org/html5/eventsource/](http://dev.w3.org/html5/eventsource/)
