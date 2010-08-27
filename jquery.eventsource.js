@@ -7,7 +7,7 @@
 
 ;(function ($) {
   
-  var streamSrcSettings  = {
+  var streamDefaults  = {
     //  IDENTITY  
     label:    null,
     url:      null,
@@ -18,10 +18,11 @@
     
     //  EXTEND `accepts` OBJECT
     accepts: $.extend({}, $.ajaxSettings.accepts, {
-      stream : 'text/event-stream'
-    })   
+      stream: 'text/event-stream'
+    })
   },
-  pluginFns  = {
+  streamCache = {}, 
+  pluginFns   = {
     
     public: {
       close: function ( label ) {
@@ -29,6 +30,7 @@
         var cache = {};
         
         if ( label !== '*' ) {
+        
           for ( var prop in streamCache ) {
             if ( label  !== prop ) {
               cache[prop] = streamCache[prop];
@@ -40,8 +42,13 @@
         
         return streamCache;
       }, 
-      streams: function () {
-        return streamCache;
+      streams: function ( label ) {
+      
+        if ( label === '*' ) {
+          return streamCache;
+        }
+        
+        return streamCache[label] ? streamCache[label] : {};
       }
     },    
     _private: {
@@ -54,7 +61,7 @@
         ).test($.isPlainObject(arg) ? JSON.stringify(arg) : arg);        
       },    
     
-    
+      //  Open a native event source 
       openEventSource: function ( options ) {
            
         streamCache[options.label].stream.addEventListener('open', function (event) {
@@ -79,25 +86,20 @@
                     event.data
                 );
 
-
-            streamCache[options.label].lastEventId = event.lastEventId;
-            
             
             this['label']  = options.label;
             
+            streamCache[options.label].lastEventId = +event.lastEventId;
+            streamCache[options.label].history[streamCache[options.label].lastEventId]  = streamData;
             streamCache[options.label].options.message.call(this, streamData[0] ? streamData[0] : null, {
               data: streamData,
               lastEventId: streamCache[options.label].lastEventId
             }, event);
           }          
-          
-          
         }, false);        
       }, 
+      // open fallback event source
       openPollingSource: function ( options ) {
-        
-        
-        
         
         if ( streamCache[options.label] ) {
         
@@ -108,16 +110,11 @@
             beforeSend: function () {
               if ( streamCache[options.label] ) {
                 
-                
                 this['label'] = options.label;
                 streamCache[options.label].options.open.call(this);
               }   
             },
             success: function ( data ) {
-            
-              if ( data.indexOf('data: ') === -1 ) {
-                return false;
-              }
 
               var parsedData  = [],
                   streamData  = $.map(  data.split("\n"), function (sdata, i) {
@@ -143,10 +140,12 @@
               }
               
               if ( streamCache[options.label] ) {
-                streamCache[options.label].lastEventId++;
+                
                 
                 this['label'] = options.label;
                 
+                streamCache[options.label].lastEventId++;
+                streamCache[options.label].history[streamCache[options.label].lastEventId]  = parsedData;
                 streamCache[options.label].options.message.call(this, parsedData[0] ? parsedData[0] : null, {
                   data: parsedData,
                   lastEventId: streamCache[options.label].lastEventId
@@ -173,34 +172,27 @@
   streamSetup = {
     stream: {}, 
     lastEventId: 0,
-    isNative: false, 
-    options: {}
+    isNative: false,
+    history:  {},
+    options:  {}
   },
-  streamCache = {},
   isNative    = window.EventSource ? true : false 
   ;
 
   $.extend({
-    
     eventsource: function ( options ) {
       
       var stream, _options;
 
       //  PLUGIN sUB FUNCTION
       if ( options && !$.isPlainObject(options) && pluginFns.public[options] ) {
-        
         //  IF NO LABEL WAS PASSED, SEND MESSAGE TO ALL STREAMS
-        if ( options === 'close' ) {
-          return pluginFns.public[options](  
-                    arguments[1] ?
-                      arguments[1]  :
-                      '*'
-                  );
-        }
-        
-        return pluginFns.public[options]();  
+        return pluginFns.public[options](  
+                  arguments[1] ?
+                    arguments[1]  :
+                    '*'
+                );
       }
-    
       
       //  IF PARAMS WERE PASSED IN AS AN OBJECT, NORMALIZE TO A QUERY STRING
       options.data    = options.data && $.isPlainObject(options.data) ? 
@@ -220,7 +212,7 @@
       
       
       //  CREATE NEW OPTIONS OBJECT
-      _options        = $.extend({}, streamSrcSettings, options);
+      _options        = $.extend({}, streamDefaults, options);
       
       //  CREATE EMPTY OBJECT IN `streamCache`
       streamCache[_options.label] = {
@@ -251,6 +243,3 @@
   });
 
 })(jQuery);
-
-
-

@@ -7,13 +7,8 @@ function sizeOf(obj) {
   return length;
 }
 
-var streams;
 
-$(function(){
-  
-  
-  
-  test("$.eventsource is a function", function() {
+test("$.eventsource is a function", function() {
     ok( $.isFunction($.eventsource), "$.eventsource is a function" );
   });
   
@@ -78,21 +73,7 @@ $(function(){
   });
   
   
-  test("$.eventsource streams Are Closed", function() {
-    
-    stop();
-    
-    equals(sizeOf($.eventsource('streams')), 0, 'there are 0 active streams');
-    
-    ok( typeof $.eventsource('streams') === 'object', '$.eventsource("streams") must return an object' );        
 
-
-    setTimeout(function(){
-      start();
-    }, 500);
-    
-  });
-  
   
 
   test("$.eventsource open/close", function() {
@@ -123,7 +104,7 @@ $(function(){
     
     setTimeout(function(){ 
       start(); 
-    }, 500);    
+    }, 1500);    
     
   });  
 
@@ -179,45 +160,27 @@ $(function(){
 
     setTimeout(function(){ 
       start(); 
-    }, 500);       
+    }, 2000);       
   });  
-  
   
   
   test("$.eventsource - multiple concurrent sources - scope tests: closing sources one at a time", function() {
     stop();
-    
-    
-    setTimeout(function() {
-      equals(sizeOf($.eventsource('close', 'event-source-1')), 2, 'Closing `event-source-1`, 2 event sources remaining');
-      start();
-    }, 200);      
-
-
-  
-    setTimeout(function() {
-      equals(1, sizeOf($.eventsource('close', 'event-source-2')), 'Closing `event-source-2`, 1 event sources remaining ');
-      start();
-    }, 300);      
 
     
     setTimeout(function() {
+      equals(2, sizeOf($.eventsource('close', 'event-source-1')), 'Closing `event-source-1`, 2 event sources remaining');
+      equals(1, sizeOf($.eventsource('close', 'event-source-2')), 'Closing `event-source-2`, 1 event sources remaining');   
       equals(0, sizeOf($.eventsource('close', 'event-source-3')), 'Closing `event-source-3`, 0 event sources remaining');
       start();
-    }, 400);      
-
-
-    
-    setTimeout(function(){ 
-       
-      equals(0, sizeOf($.eventsource('streams')), 'All Event Sources closed');
-      start();
-    }, 500);  
+    }, 500);          
   });    
   
 
   test("$.eventsource - breakage tests", function() {
-
+    
+    stop();
+    
     try {
       $.eventsource({});    
       
@@ -288,8 +251,10 @@ $(function(){
       ok(true, 'Caught the error thrown by the instance options.url being `true`');
     }    
 
-    
-    
+    setTimeout(function(){ 
+      start();
+    }, 3000);      
+    /*
     // this will error, but not testing?
     $.eventsource({
       label:    'event-source-3',
@@ -298,121 +263,113 @@ $(function(){
       open:  function () {},
       message:  function (data) {}
     });   
-        
+        */
     
 
   });    
-});
 
 
 
-  
-test("$.eventsource ignores incorrect server response prefix", function() {  
-  stop();
-  
-  var isignored = true, 
-      isopened  = false;
-  
-  $.eventsource({
-    label:    'text-event-source',
-    url:      '../test-event-sources/event-source-5.php',
-    open:  function () {
-      isopened  = true;
-    },
-    message:  function (data) {
-      isignored = false;
-    }
+
+
+
+
+
+  test("$.eventsource streams object", function() {  
+
+    stop();
+
+    setTimeout(function(){
+      // labeled stream
+      $.eventsource({
+        label:    'labeled-stream',
+        url:      '../test-event-sources/event-source-1.php',
+        open:  function () {
+        },
+        message:  function (data) {
+        }
+      });
+
+      // unlabeled stream
+      $.eventsource({
+        url:      '../test-event-sources/event-source-2.php',
+        open:  function () {
+        },
+        message:  function (data) {
+        }
+      });
+
+
+      // no callbacks
+      $.eventsource({
+        url:      '../test-event-sources/event-source-2.php'
+      });
+      
+      
+
+      var streamsObj  = $.eventsource('streams');
+
+      ok( typeof streamsObj === 'object', '$.eventsource("streams") must return an object' );
+
+
+      $.each(streamsObj, function (i, obj) {
+
+        equals( typeof obj.isNative, 'boolean', 'Stream.isNative exists and is a boolean value' );
+
+        equals( typeof obj.lastEventId, 'number', 'Stream.lastEventId exists and is a boolean value' );
+
+        equals( obj.options.label && obj.options.label !== '', true, 'Stream.options.label exists and not an empty string' );
+
+        equals( obj.options.message && $.isFunction(obj.options.message), true, 'Stream.options.message exists and is a function' );
+
+        equals( obj.options.open && $.isFunction(obj.options.open), true, 'Stream.options.message exists and is a function' );
+
+
+        if ( obj.isNative ) {
+          equals( obj.stream.toString(), '[object EventSource]',  'Native Streams are [object EventSource]'  );
+        } 
+
+        if ( !obj.isNative ) {
+          if ( window.XMLHttpRequest ) {
+            equals( obj.stream.toString(), '[object XMLHttpRequest]',  'Non-Native Streams are [object XMLHttpRequest]'  );
+          }
+          else {
+            ok( true, 'Missing IE Stream type test!!'  );
+          }
+        }
+
+      });
+
+      equals( typeof $.eventsource('close'), 'object', '$.eventsource("close") must return an object' );
+
+      equals( typeof $.eventsource('streams'), 'object', '$.eventsource("streams") must return an object' );
+
+      start();
+
+    }, 4000);
+
+
+
+
+
+    // ADD TESTING FOR CONTENT TYPES, CHAR ENCODING
+
+
+
   });
-
-
-  setTimeout(function(){
-    
-    /*
-    var stream  = $.eventsource('stream', 'text-event-source');
-    
-    if ( !stream.isNative ) {
-      ok(isopened, 'open the event source');
-    } else {
-      ok(!isopened, 'open the event source');
-    }
-    */
-    
-    ok(isignored, 'However, server responses missing the response prefix will be ignored');
-    
-    start();
-  }, 2000);
   
-  
-  
-  
-  ok( typeof $.eventsource('close', 'text-event-source') === 'object', '$.eventsource("close") must return an object' );
-});
 
-
-
-test("$.eventsource streams object", function() {  
-  
-  stop();
-  
-  setTimeout(function(){
-    // labeled stream
-    $.eventsource({
-      label:    'labeled-stream',
-      url:      '../test-event-sources/event-source-1.php',
-      open:  function () {
-      },
-      message:  function (data) {
-      }
-    });
-
-    // unlabeled stream
-    $.eventsource({
-      url:      '../test-event-sources/event-source-2.php',
-      open:  function () {
-      },
-      message:  function (data) {
-      }
-    });
-  
-  
-    var streamsObj  = $.eventsource('streams');
+  test("$.eventsource streams Are Closed", function() {
     
-    ok( typeof streamsObj === 'object', '$.eventsource("streams") must return an object' );
+    stop();
     
+    equals(sizeOf($.eventsource('streams')), 0, 'there are 0 active streams');
     
-    $.each(streamsObj, function (i, obj) {
+    ok( typeof $.eventsource('streams') === 'object', '$.eventsource("streams") must return an object' );        
 
-      ok( typeof obj.isNative === 'boolean', 'Stream.options.isNative exists and is a boolean value' );
 
-      ok( typeof obj.lastEventId === 'number', 'Stream.options.isNative exists and is a boolean value' );
+    setTimeout(function(){
+      start();
+    }, 1000);
     
-      ok( obj.options.label && obj.options.label !== '', 'Stream.options.label exists and not an empty string' );
-
-      ok( obj.options.message && $.isFunction(obj.options.message), 'Stream.options.message exists and is a function' );
-
-      ok( obj.options.open && $.isFunction(obj.options.open), 'Stream.options.message exists and is a function' );
-      
-      
-      if ( obj.isNative ) {
-        ok( (obj.stream.toString() === '[object EventSource]'), 'Native Streams are [object EventSource]'  );
-      } 
-      
-      if ( !obj.isNative ) {
-        if ( window.XMLHttpRequest ) {
-          ok( (obj.stream.toString() === '[object XMLHttpRequest]'), 'Non-Native Streams are [object XMLHttpRequest]'  );
-        }
-        else {
-          ok( true, 'Missing IE Stream type test!!'  );
-        }
-      }
-    
-    });
-    
-    ok( typeof $.eventsource('close') === 'object', '$.eventsource("close") must return an object' );
-    
-    ok( typeof $.eventsource('streams') === 'object', '$.eventsource("streams") must return an object' );
-    
-    start();
-
-  }, 5000);
-});
+  });
