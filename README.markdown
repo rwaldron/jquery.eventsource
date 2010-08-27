@@ -8,6 +8,8 @@ and falls back to Ajax polling logic when it's not.
 [http://wiki.github.com/rwldrn/jquery.eventsource/](http://wiki.github.com/rwldrn/jquery.eventsource/)
 
 
+[http://code.bocoup.com/jquery.eventsource/unit-tests/](http://code.bocoup.com/jquery.eventsource/unit-tests/)
+
 
 ## Provides cross browser implementation for:
 
