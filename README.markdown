@@ -11,6 +11,11 @@ and falls back to Ajax polling logic when it's not.
 [http://code.bocoup.com/jquery.eventsource/unit-tests/](http://code.bocoup.com/jquery.eventsource/unit-tests/)
 
 
+## Real World Example
+
+[http://yakyakface.com/](http://yakyakface.com/)
+
+
 ## Provides cross browser implementation for:
 
 [http://dev.w3.org/html5/eventsource/](http://dev.w3.org/html5/eventsource/)
