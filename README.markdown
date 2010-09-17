@@ -44,10 +44,8 @@ and falls back to Ajax polling logic when it's not.
       //  `onopen`
       open:  function (data) {
 
-        console.group('$.eventsource() - Example 1 : TEXT open callback');
-          console.log( 'opened' );
-          console.log(data);
-        console.groupEnd('$.eventsource() - Example 1 : TEXT open callback');
+
+        console.log(data);
 
       },
 
@@ -56,10 +54,8 @@ and falls back to Ajax polling logic when it's not.
       message:  function (data) {
 
 
-        console.group('$.eventsource() - Example 1 : TEXT message callback');
-          console.log( 'message received' );
-          console.log(data);
-        console.groupEnd('$.eventsource() - Example 1 : TEXT message callback');
+        console.log(data);
+
       }
     });
     
@@ -78,17 +74,14 @@ and falls back to Ajax polling logic when it's not.
       url:      'test-event-sources/text-event-source.php',
       open:  function () {
 
-        console.group('$.eventsource() - Example 1 : TEXT open callback');
-          console.log( 'opened' );
+        console.log( 'opened' );
 
-        console.groupEnd('$.eventsource() - Example 1 : TEXT open callback');
       },
       message:  function (data) {
-        console.group('$.eventsource() - Example 1 : TEXT message callback');
-          console.log( 'message received' );
-          console.log(data);
-        console.groupEnd('$.eventsource() - Example 1 : TEXT message callback');
-        
+
+        console.log(data);
+
+
         $.eventsource('close', 'text-event-source');
       }
     });
@@ -98,18 +91,11 @@ and falls back to Ajax polling logic when it's not.
       label:    'text-event-source-ct',
       url:      'test-event-sources/text-event-source-ct.php',
       dataType: 'text',
-      open:  function () {
-        console.group('$.eventsource() - Example 2 : TEXT open callback');
-          console.log( 'opened' );
 
-        console.groupEnd('$.eventsource() - Example 2 : TEXT open callback');
-      },
       message:  function (data) {
-        console.group('$.eventsource() - Example 2 : TEXT message callback');
-          console.log( 'message received' );
-          console.log(data);
-        console.groupEnd('$.eventsource() - Example 2 : TEXT message callback');
-        
+
+        console.log(data);
+
         $.eventsource('close', 'text-event-source-ct');
       }
     });
@@ -121,18 +107,14 @@ and falls back to Ajax polling logic when it's not.
       url:      'test-event-sources/json-event-source.php',
       dataType: 'json',
       open:  function () {
-        console.group('$.eventsource() - Example 3 : JSON open callback');
-          console.log( 'opened' );
+
+        console.log( 'opened' );
     
-        console.groupEnd('$.eventsource() - Example 3 : JSON open callback');
       },
       message:  function (data) {
-        console.group('$.eventsource() - Example 3 : JSON message callback');
-          console.log( 'message received' );
-          console.log(data);
-        console.groupEnd('$.eventsource() - Example 3 : JSON message callback');
-        
-        
+
+        console.log(data);
+
         $.eventsource('close', 'json-event-source');
       }
     });     
