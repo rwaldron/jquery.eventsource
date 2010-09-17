@@ -80,13 +80,11 @@
           
             var streamData  = [];
 
-                streamData.push(
-                  pluginFns._private.isJson(event.data) ? 
-                    JSON.parse(event.data) : 
-                    event.data
-                );
+            streamData[streamData.length] = pluginFns._private.isJson(event.data) ? 
+                                              JSON.parse(event.data) : 
+                                              event.data
+                
 
-            
             this['label']  = options.label;
             
             streamCache[options.label].lastEventId = +event.lastEventId;
@@ -116,7 +114,8 @@
             },
             success: function ( data ) {
 
-              var parsedData  = [],
+              var tempdata,
+                  parsedData  = [],
                   streamData  = $.map(  data.split("\n"), function (sdata, i) {
                                   if ( sdata ) {
                                     return sdata;
@@ -127,7 +126,7 @@
               
                 for ( var i = 0; i < streamData.length; i++ ) {
 
-                  var tempdata  = streamData[i].split('data: ')[1];
+                  tempdata  = streamData[i].split('data: ')[1];
                   
                   // CONVERT TO PROPER `dataType` HERE
                   if ( options.dataType === 'json' ) {
@@ -135,7 +134,7 @@
                   }
 
 
-                  parsedData.push(tempdata);
+                  parsedData[parsedData.length] = tempdata;
                 }
               }
               
