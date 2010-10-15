@@ -21,6 +21,11 @@ and falls back to Ajax polling logic when it's not.
 [http://dev.w3.org/html5/eventsource/](http://dev.w3.org/html5/eventsource/)
 
 
+## Unit tests
+
+[http://yakyakface.com/jquery.eventsource/unit-tests/](http://yakyakface.com/jquery.eventsource/unit-tests/)
+
+
 
 
 ## Usage
