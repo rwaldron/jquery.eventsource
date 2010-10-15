@@ -10,6 +10,8 @@ function sizeOf(obj) {
 
 test("$.eventsource is a function", function() {
     ok( $.isFunction($.eventsource), "$.eventsource is a function" );
+    
+    equals(sizeOf($.eventsource('streams')), 0, 'There are no streams');
   });
   
   test("$.eventsource callbacks", function() {  

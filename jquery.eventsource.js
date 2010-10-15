@@ -48,13 +48,15 @@
           return streamCache;
         }
         
-        return streamCache[label] ? streamCache[label] : {};
+        return streamCache[label] || {};
       }
     },    
     _private: {
 
       isJson:       function ( arg ) {
-        if ( arg === null ) return false;
+        if ( arg === null ) {
+          return false;
+        }
         
         return ( 
           new RegExp('^("(\\\\.|[^"\\\\\\n\\r])*?"|[,:{}\\[\\]0-9.\\-+Eaeflnr-u \\n\\r\\t])+?$') 
