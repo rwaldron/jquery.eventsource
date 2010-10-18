@@ -107,6 +107,9 @@
             }, event);
           }          
         }, false);        
+        
+        
+        return stream.cache[options.label].stream;
       }, 
       // open fallback event source
       openPollingSource: function ( options ) {
