@@ -7,21 +7,25 @@
 
 ;(function ($) {
   
-  var streamDefaults  = {
-    //  IDENTITY  
-    label:    null,
-    url:      null,
-    
-    //  EVENT CALLBACKS
-    open:     $.noop,
-    message:  $.noop,
-    
-    //  EXTEND `accepts` OBJECT
-    accepts: $.extend({}, $.ajaxSettings.accepts, {
-      stream: 'text/event-stream'
-    })
+  var stream  = {
+  
+    defaults: {
+      //  IDENTITY  
+      label:    null,
+      url:      null,
+
+      //  EVENT CALLBACKS
+      open:     $.noop,
+      message:  $.noop,
+
+      //  EXTEND `accepts` OBJECT
+      accepts: $.extend({}, $.ajaxSettings.accepts, {
+        stream: 'text/event-stream'
+      })
+    },
+    cache:  {}
   },
-  streamCache = {}, 
+  
   pluginFns   = {
     
     public: {
@@ -31,24 +35,24 @@
         
         if ( label !== '*' ) {
         
-          for ( var prop in streamCache ) {
+          for ( var prop in stream.cache ) {
             if ( label  !== prop ) {
-              cache[prop] = streamCache[prop];
+              cache[prop] = stream.cache[prop];
             }
           }
         }
         
-        streamCache = cache;
+        stream.cache = cache;
         
-        return streamCache;
+        return stream.cache;
       }, 
       streams: function ( label ) {
       
         if ( label === '*' ) {
-          return streamCache;
+          return stream.cache;
         }
         
-        return streamCache[label] || {};
+        return stream.cache[label] || {};
       }
     },    
     _private: {
@@ -66,19 +70,19 @@
       //  Open a native event source 
       openEventSource: function ( options ) {
            
-        streamCache[options.label].stream.addEventListener('open', function (event) {
-          if ( streamCache[options.label] ) {
+        stream.cache[options.label].stream.addEventListener('open', function (event) {
+          if ( stream.cache[options.label] ) {
           
             this['label']  = options.label;
             
-            streamCache[options.label].options.open.call(this, event);
+            stream.cache[options.label].options.open.call(this, event);
           }   
         }, false);
 
 
-        streamCache[options.label].stream.addEventListener('message', function (event) {
+        stream.cache[options.label].stream.addEventListener('message', function (event) {
           
-          if ( streamCache[options.label] ) {
+          if ( stream.cache[options.label] ) {
           
             var streamData  = [];
 
@@ -89,11 +93,11 @@
 
             this['label']  = options.label;
             
-            streamCache[options.label].lastEventId = +event.lastEventId;
-            streamCache[options.label].history[streamCache[options.label].lastEventId]  = streamData;
-            streamCache[options.label].options.message.call(this, streamData[0] ? streamData[0] : null, {
+            stream.cache[options.label].lastEventId = +event.lastEventId;
+            stream.cache[options.label].history[stream.cache[options.label].lastEventId]  = streamData;
+            stream.cache[options.label].options.message.call(this, streamData[0] ? streamData[0] : null, {
               data: streamData,
-              lastEventId: streamCache[options.label].lastEventId
+              lastEventId: stream.cache[options.label].lastEventId
             }, event);
           }          
         }, false);        
@@ -101,17 +105,17 @@
       // open fallback event source
       openPollingSource: function ( options ) {
         
-        if ( streamCache[options.label] ) {
+        if ( stream.cache[options.label] ) {
         
           var source  = $.ajax({
             type:       'GET',
             url:        options.url,
             data:       options.data,
             beforeSend: function () {
-              if ( streamCache[options.label] ) {
+              if ( stream.cache[options.label] ) {
                 
                 this['label'] = options.label;
-                streamCache[options.label].options.open.call(this);
+                stream.cache[options.label].options.open.call(this);
               }   
             },
             success: function ( data ) {
@@ -140,16 +144,16 @@
                 }
               }
               
-              if ( streamCache[options.label] ) {
+              if ( stream.cache[options.label] ) {
                 
                 
                 this['label'] = options.label;
                 
-                streamCache[options.label].lastEventId++;
-                streamCache[options.label].history[streamCache[options.label].lastEventId]  = parsedData;
-                streamCache[options.label].options.message.call(this, parsedData[0] ? parsedData[0] : null, {
+                stream.cache[options.label].lastEventId++;
+                stream.cache[options.label].history[stream.cache[options.label].lastEventId]  = parsedData;
+                stream.cache[options.label].options.message.call(this, parsedData[0] ? parsedData[0] : null, {
                   data: parsedData,
-                  lastEventId: streamCache[options.label].lastEventId
+                  lastEventId: stream.cache[options.label].lastEventId
                 });
 
 
@@ -180,67 +184,66 @@
   isNative    = window.EventSource ? true : false 
   ;
 
-  $.extend({
-    eventsource: function ( options ) {
+  $.eventsource = function ( options ) {
       
-      var stream, _options;
+    var _stream, _options;
 
-      //  PLUGIN sUB FUNCTION
-      if ( options && !$.isPlainObject(options) && pluginFns.public[options] ) {
-        //  IF NO LABEL WAS PASSED, SEND MESSAGE TO ALL STREAMS
-        return pluginFns.public[options](  
-                  arguments[1] ?
-                    arguments[1]  :
-                    '*'
-                );
-      }
-      
-      //  IF PARAMS WERE PASSED IN AS AN OBJECT, NORMALIZE TO A QUERY STRING
-      options.data    = options.data && $.isPlainObject(options.data) ? 
-                          $.param(options.data) : 
-                          options.data;      
-      
-      //  Mimick the native behavior?
-      if ( !options.url || typeof options.url !== 'string'  ) {
-        throw new SyntaxError('Not enough arguments: Must provide a url');
-      }
-      
-      
-      //  IF NO EXPLICIT LABEL, SET INTERNAL LABEL
-      options.label   = !options.label ? 
-                          options.url + '?' + options.data : 
-                          options.label;
-      
-      
-      //  CREATE NEW OPTIONS OBJECT
-      _options        = $.extend({}, streamDefaults, options);
-      
-      //  CREATE EMPTY OBJECT IN `streamCache`
-      streamCache[_options.label] = {
-        options: _options
-      };
-      
-      
-      //  DETERMINE AND DECLARE `stream`
-      stream  = !isNative ?
-                  //  IF NOT NATIVE, OPEN A POLLING FALLBACK
-                  pluginFns._private.openPollingSource(_options) :
-                  new EventSource(_options.url + ( _options.data ? '?' + _options.data : '' ) );
-
-      //  ADD TO EVENT SOURCES
-      streamCache[_options.label] = $.extend({}, streamSetup, {
-        stream: stream, 
-        isNative: isNative, 
-        options: _options
-      });
-      
-      
-      if ( isNative ) {
-        pluginFns._private.openEventSource(_options);
-      }
-      
-      return streamCache;
+    //  PLUGIN sUB FUNCTION
+    if ( options && !$.isPlainObject(options) && pluginFns.public[options] ) {
+      //  IF NO LABEL WAS PASSED, SEND MESSAGE TO ALL STREAMS
+      return pluginFns.public[options](  
+                arguments[1] ?
+                  arguments[1]  :
+                  '*'
+              );
     }
-  });
+
+    //  IF PARAMS WERE PASSED IN AS AN OBJECT, NORMALIZE TO A QUERY STRING
+    options.data    = options.data && $.isPlainObject(options.data) ? 
+                        $.param(options.data) : 
+                        options.data;      
+
+    //  Mimick the native behavior?
+    if ( !options.url || typeof options.url !== 'string'  ) {
+      throw new SyntaxError('Not enough arguments: Must provide a url');
+    }
+
+
+    //  IF NO EXPLICIT LABEL, SET INTERNAL LABEL
+    options.label   = !options.label ? 
+                        options.url + '?' + options.data : 
+                        options.label;
+
+
+    //  CREATE NEW OPTIONS OBJECT
+    _options        = $.extend({}, stream.defaults, options);
+
+    //  CREATE EMPTY OBJECT IN `stream.cache`
+    stream.cache[_options.label] = {
+      options: _options
+    };
+
+
+    //  DETERMINE AND DECLARE `stream`
+    _stream  = !isNative ?
+                //  IF NOT NATIVE, OPEN A POLLING FALLBACK
+                pluginFns._private.openPollingSource(_options) :
+                new EventSource(_options.url + ( _options.data ? '?' + _options.data : '' ) );
+
+    //  ADD TO EVENT SOURCES
+    stream.cache[_options.label] = $.extend({}, streamSetup, {
+      stream: _stream, 
+      isNative: isNative, 
+      options: _options
+    });
+
+
+    if ( isNative ) {
+      pluginFns._private.openEventSource(_options);
+    }
+
+    return stream.cache;
+  };
+
 
 })(jQuery);

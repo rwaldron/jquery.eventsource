@@ -135,8 +135,6 @@ and falls back to Ajax polling logic when it's not.
     
     //  Server response MUST be Content-Type: text/event-stream
     //  Server response MUST be prepended with 'data: '
-    //  UPDATE: Recent testing shows that the "data: " prefix is
-    //  no longer required, at least in nightly Chromium builds
 
     
     // Examples:
