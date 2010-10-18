@@ -6,6 +6,10 @@
  */
 
 ;(function ($) {
+
+  $.extend($.ajaxSettings.accepts, {
+    stream: 'text/event-stream'
+  })  
   
   var stream  = {
   
@@ -16,13 +20,15 @@
 
       //  EVENT CALLBACKS
       open:     $.noop,
-      message:  $.noop,
-
-      //  EXTEND `accepts` OBJECT
-      accepts: $.extend({}, $.ajaxSettings.accepts, {
-        stream: 'text/event-stream'
-      })
+      message:  $.noop
     },
+    setup: {
+      stream:   {}, 
+      lastEventId: 0,
+      isNative: false,
+      history:  {},
+      options:  {}
+    },    
     cache:  {}
   },
   
@@ -166,20 +172,12 @@
               }                
             },
             cache:      false,
-            timeout:    50000,
-            accepts:    options.accepts
+            timeout:    50000
           });
         }
         return source;
       }
     }
-  },
-  streamSetup = {
-    stream: {}, 
-    lastEventId: 0,
-    isNative: false,
-    history:  {},
-    options:  {}
   },
   isNative    = window.EventSource ? true : false 
   ;
@@ -231,7 +229,7 @@
                 new EventSource(_options.url + ( _options.data ? '?' + _options.data : '' ) );
 
     //  ADD TO EVENT SOURCES
-    stream.cache[_options.label] = $.extend({}, streamSetup, {
+    stream.cache[_options.label] = $.extend({}, stream.setup, {
       stream: _stream, 
       isNative: isNative, 
       options: _options
