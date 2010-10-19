@@ -189,9 +189,9 @@
       
     var _stream, _options;
 
-    //  PLUGIN sUB FUNCTION
+    //  Plugin sub function
     if ( options && !$.isPlainObject(options) && pluginFns.public[options] ) {
-      //  IF NO LABEL WAS PASSED, SEND MESSAGE TO ALL STREAMS
+      //  If no label was passed, send message to all streams
       return pluginFns.public[options](  
                 arguments[1] ?
                   arguments[1]  :
@@ -199,7 +199,7 @@
               );
     }
 
-    //  IF PARAMS WERE PASSED IN AS AN OBJECT, NORMALIZE TO A QUERY STRING
+    //  If params were passed in as an object, normalize to a query string
     options.data    = options.data && $.isPlainObject(options.data) ? 
                         $.param(options.data) : 
                         options.data;      
@@ -210,28 +210,28 @@
     }
 
 
-    //  IF NO EXPLICIT LABEL, SET INTERNAL LABEL
+    //  If no explicit label, set internal label
     options.label   = !options.label ? 
                         options.url + '?' + options.data : 
                         options.label;
 
 
-    //  CREATE NEW OPTIONS OBJECT
+    //  Create new options object
     _options        = $.extend({}, stream.defaults, options);
 
-    //  CREATE EMPTY OBJECT IN `stream.cache`
+    //  Create empty object in `stream.cache`
     stream.cache[_options.label] = {
       options: _options
     };
 
 
-    //  DETERMINE AND DECLARE `stream`
+    //  Determine and declare `stream`
     _stream  = !isNative ?
-                //  IF NOT NATIVE, OPEN A POLLING FALLBACK
+                //  If not native, open a polling fallback
                 pluginFns._private.openPollingSource(_options) :
                 new EventSource(_options.url + ( _options.data ? '?' + _options.data : '' ) );
 
-    //  ADD TO EVENT SOURCES
+    //  ADd to event sources
     stream.cache[_options.label] = $.extend({}, stream.setup, {
       stream: _stream, 
       isNative: isNative, 
