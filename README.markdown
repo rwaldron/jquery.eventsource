@@ -13,8 +13,8 @@ and falls back to Ajax polling logic when it's not.
 
 ## Some Thoughts...
 
-+ why use EventSource rather than Websockets?
-++ EventSource is easier to setup on server (uses http), lighter and most of the times - that's what you acually need.
+* Q. why use EventSource rather than Websockets?
+  A. EventSource is easier to setup on server (uses http), lighter and most of the times - that's what you acually need.
 
 
 ## Real World Example
