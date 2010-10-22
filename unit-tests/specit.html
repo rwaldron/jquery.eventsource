@@ -10,10 +10,24 @@
   
   <script src="../jquery.eventsource.js"></script>
   <script src="jquery.eventsource.specit.js"></script>
+  
+  <script>
+  
+  $(function () {
 
+    if(top.location != location) {
+      
+      $('body').css({
+        marginLeft: '0px',
+        marginTop: '0px'
+      });
+      
+    }
+  });
+  </script>
 </head>
 <body>
-  <h1 id="qunit-header">jquery.eventsource.specit.js - must pass 100% in: Chrome, FF, Opera, Safari & IE  (<a href="index.html">unit tests</a>)</h1>
+  <h1 id="qunit-header">jquery.eventsource.specit.js - must pass 100% in: Chrome, FF, Opera, Safari & IE  <!--(<a href="index.html">unit tests</a>)-->\</h1>
   <h2 id="qunit-banner"></h2>
   <h2 id="qunit-userAgent"></h2>
   <ol id="qunit-tests"></ol>
