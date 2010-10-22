@@ -68,6 +68,31 @@ $(function () {
       $.eventsource('close', 'json-event-source');
     }
   });
+  
+  
+  // JSON EXAMPLE - POST AND SLOWER REQUEST INTERVAL
+  $.eventsource({
+    label:    'json-event-source',
+    url:      'test-event-sources/event-source-2.php',
+    dataType: 'json',
+    requestType: 'POST',
+    requestInterval: 15000,
+    open:  function () {
+      console.group('$.eventsource() - Example 3 : JSON open callback');
+        console.log( 'opened' );
+  
+      console.groupEnd('$.eventsource() - Example 3 : JSON open callback');
+    },
+    message:  function (data) {
+      console.group('$.eventsource() - Example 3 : JSON message callback');
+        console.log( 'message received' );
+        console.log(data);
+      console.groupEnd('$.eventsource() - Example 3 : JSON message callback');
+      
+      
+      $.eventsource('close', 'json-event-source');
+    }
+  });
 
 
 

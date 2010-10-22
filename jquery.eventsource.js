@@ -117,9 +117,10 @@
         if ( stream.cache[options.label] ) {
         
           var source  = $.ajax({
-            type:       'GET',
+            type:       options.requestType ? options.requestType : "GET",
             url:        options.url,
             data:       options.data,
+            ifModified: options.ifModified ? true : false,
             beforeSend: function () {
               if ( stream.cache[options.label] ) {
                 
@@ -170,12 +171,12 @@
                   function () {
                     pluginFns._private.openPollingSource.call(this, options);
                   },
-                  500// matches speed of native EventSource
+                  options.requestInterval ? options.requestInterval : 500 // matches speed of native EventSource
                 );
               }                
             },
             cache:      false,
-            timeout:    50000
+            timeout:    options.timeout ? options.timeout : 50000
           });
         }
         return source;

@@ -45,6 +45,26 @@ and falls back to Ajax polling logic when it's not.
       
       dataType: 'json', 
       
+      // Set wether you want to do a GET or POST request
+      // Default if none specified is GET
+      
+      requestType: 'GET',
+      
+      // Set the request interval
+      // Default if none specified 500
+      
+      requestInterval: 500,
+      
+      // Set when the request should timeout
+      // Default: 50000 if none specified
+      
+      timeout: 50000,
+      
+      // Set wether to only fire the success event if content has been modified
+      // Default is false
+      
+      ifModified: false,
+      
       //  Set a callback to fire when the event source is opened
       //  `onopen`
       open:  function (data) {
