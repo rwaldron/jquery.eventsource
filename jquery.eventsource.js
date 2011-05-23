@@ -217,7 +217,7 @@
     streamType = !isNative ?
                 //  If not native, open a polling fallback
                 pluginFns._private.openPollingSource(opts) :
-                new EventSource(opts.url + ( opts.data ? "?" + opts.data : '' ) );
+                new EventSource(opts.url + ( opts.data ? "?" + opts.data : "" ) );
 
     //  ADd to event sources
     stream.cache[ opts.label ] = jQuery.extend({}, stream.setup, {
