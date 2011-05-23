@@ -1,5 +1,7 @@
 # jQuery.EventSource
 
+# TODO: Rewrite with jQuery Deferred Objects
+
 
 Gives developers the power of the EventSource API across browsers. Uses the EventSource constructor when natively available 
 and falls back to Ajax polling logic when it's not. 
@@ -153,13 +155,4 @@ and falls back to Ajax polling logic when it's not.
     //  Python
     print "Content-Type: text/event-stream"
     print "data: this is a valid response"
-
-    
-    
-
-
-
-
-
-
 

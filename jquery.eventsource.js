@@ -1,250 +1,238 @@
 /*!
  * jQuery Event Source
  * 
- * Copyright (c) 2010 Rick Waldron
+ * Copyright (c) 2011 Rick Waldron
  * Dual licensed under the MIT and GPL licenses.
  */
 
-;(function ($) {
+(function( jQuery, global ) {
 
-  $.extend($.ajaxSettings.accepts, {
-    stream: 'text/event-stream'
-  })  
+  jQuery.extend( jQuery.ajaxSettings.accepts, {
+    stream: "text/event-stream"
+  });  
   
   var stream  = {
   
     defaults: {
-      //  IDENTITY  
-      label:    null,
-      url:      null,
+      // Stream identity
+      label: null,
+      url: null,
 
-      //  EVENT CALLBACKS
-      open:     $.noop,
-      message:  $.noop
+      // Event Callbacks
+      open: jQuery.noop,
+      message: jQuery.noop
     },
     setup: {
-      stream:   {}, 
+      stream: {}, 
       lastEventId: 0,
       isNative: false,
-      history:  {},
-      options:  {}
-    },    
-    cache:  {}
+      history: {},
+      options: {}
+    },
+    cache: {}
   },
-  
+
   pluginFns   = {
-    
+
     public: {
       close: function ( label ) {
-        
+
         var cache = {};
         
-        if ( label !== '*' ) {
-        
+        if ( label !== "*" ) {
+
           for ( var prop in stream.cache ) {
             if ( label  !== prop ) {
-              cache[prop] = stream.cache[prop];
+              cache[ prop ] = stream.cache[ prop ];
             }
           }
         }
-        
+
         stream.cache = cache;
-        
+
         return stream.cache;
       }, 
       streams: function ( label ) {
-      
-        if ( label === '*' ) {
+
+        if ( label === "*" ) {
           return stream.cache;
         }
-        
-        return stream.cache[label] || {};
+
+        return stream.cache[ label ] || {};
       }
-    },    
+    },
     _private: {
 
-      isJson:       function ( arg ) {
-        if ( arg === null ) {
-          return false;
-        }
-        
-        return ( 
-          new RegExp('^("(\\\\.|[^"\\\\\\n\\r])*?"|[,:{}\\[\\]0-9.\\-+Eaeflnr-u \\n\\r\\t])+?$') 
-        ).test($.isPlainObject(arg) ? JSON.stringify(arg) : arg);        
-      },    
-    
+
       //  Open a native event source 
       openEventSource: function ( options ) {
-           
-        stream.cache[options.label].stream.addEventListener('open', function (event) {
-          if ( stream.cache[options.label] ) {
+        var label = options.label;
+
+        stream.cache[ label ].stream.addEventListener("open", function (event) {
+          if ( stream.cache[label] ) {
           
-            this['label']  = options.label;
+            this["label"]  = label;
             
-            stream.cache[options.label].options.open.call(this, event);
+            stream.cache[label].options.open.call(this, event);
           }   
         }, false);
 
 
-        stream.cache[options.label].stream.addEventListener('message', function (event) {
-          
-          if ( stream.cache[options.label] ) {
-          
+        stream.cache[label].stream.addEventListener("message", function (event) {
+
+          if ( stream.cache[label] ) {
+
             var streamData  = [];
 
-            streamData[streamData.length] = pluginFns._private.isJson(event.data) ? 
-                                              JSON.parse(event.data) : 
-                                              event.data
-                
+            streamData[ streamData.length ] = jQuery.parseJSON( event.data );
 
-            this['label']  = options.label;
-            
-            stream.cache[options.label].lastEventId = +event.lastEventId;
-            stream.cache[options.label].history[stream.cache[options.label].lastEventId]  = streamData;
-            stream.cache[options.label].options.message.call(this, streamData[0] ? streamData[0] : null, {
+            this["label"]  = label;
+
+            stream.cache[label].lastEventId = +event.lastEventId;
+            stream.cache[label].history[stream.cache[label].lastEventId]  = streamData;
+            stream.cache[label].options.message.call(this, streamData[0] ? streamData[0] : null, {
               data: streamData,
-              lastEventId: stream.cache[options.label].lastEventId
+              lastEventId: stream.cache[label].lastEventId
             }, event);
-          }          
-        }, false);        
-        
-        
-        return stream.cache[options.label].stream;
+          }
+        }, false);
+
+        return stream.cache[label].stream;
       }, 
       // open fallback event source
       openPollingSource: function ( options ) {
+        var label = options.label;
         
-        if ( stream.cache[options.label] ) {
+        if ( stream.cache[label] ) {
         
-          var source  = $.ajax({
-            type:       'GET',
-            url:        options.url,
-            data:       options.data,
+          var source  = jQuery.ajax({
+            type: "GET",
+            url: options.url,
+            data: options.data,
             beforeSend: function () {
-              if ( stream.cache[options.label] ) {
+              if ( stream.cache[label] ) {
                 
-                this['label'] = options.label;
-                stream.cache[options.label].options.open.call(this);
+                this["label"] = label;
+                stream.cache[label].options.open.call( this );
               }   
             },
             success: function ( data ) {
 
               var tempdata,
-                  parsedData  = [],
-                  streamData  = $.map(  data.split("\n"), function (sdata, i) {
+              		label = options.label,
+                  parsedData = [],
+                  streamData = jQuery.map( data.split("\n"), function(sdata, i) {
                                   if ( sdata ) {
                                     return sdata;
                                   }
                                 });
 
-              if ( $.isArray(streamData) ) {
+              if ( jQuery.isArray(streamData) ) {
               
                 for ( var i = 0; i < streamData.length; i++ ) {
 
-                  tempdata  = streamData[i].split('data: ')[1];
-                  
-                  // CONVERT TO PROPER `dataType` HERE
-                  if ( options.dataType === 'json' ) {
-                    tempdata  = JSON.parse(tempdata);
+                  tempdata  = streamData[i].split("data: ")[1];
+
+                  // Convert `dataType` here
+                  if ( options.dataType === "json" ) {
+                    tempdata  = JSON.parse( tempdata );
                   }
 
-
-                  parsedData[parsedData.length] = tempdata;
+                  parsedData[ parsedData.length ] = tempdata;
                 }
               }
-              
-              if ( stream.cache[options.label] ) {
-                
-                
-                this['label'] = options.label;
-                
-                stream.cache[options.label].lastEventId++;
-                stream.cache[options.label].history[stream.cache[options.label].lastEventId]  = parsedData;
-                stream.cache[options.label].options.message.call(this, parsedData[0] ? parsedData[0] : null, {
+
+              if ( stream.cache[label] ) {
+
+                this["label"] = label;
+
+                stream.cache[label].lastEventId++;
+                stream.cache[label].history[stream.cache[label].lastEventId]  = parsedData;
+                stream.cache[label].options.message.call(this, parsedData[0] ? parsedData[0] : null, {
                   data: parsedData,
-                  lastEventId: stream.cache[options.label].lastEventId
+                  lastEventId: stream.cache[label].lastEventId
                 });
 
 
                 setTimeout(
                   function () {
-                    pluginFns._private.openPollingSource.call(this, options);
+                    pluginFns._private.openPollingSource.call( this, options );
                   },
-                  500// matches speed of native EventSource
+                  // matches speed of native EventSource
+                  500
                 );
-              }                
+              }
             },
-            cache:      false,
-            timeout:    50000
+            cache: false,
+            timeout: 50000
           });
         }
         return source;
       }
     }
   },
-  isNative    = window.EventSource ? true : false 
-  ;
+  isNative = global.EventSource ? true : false;
 
-  $.eventsource = function ( options ) {
-      
-    var _stream, _options;
+  jQuery.eventsource = function( options ) {
+
+    var streamType, opts;
 
     //  Plugin sub function
-    if ( options && !$.isPlainObject(options) && pluginFns.public[options] ) {
+    if ( options && !jQuery.isPlainObject( options ) && pluginFns.public[ options ] ) {
       //  If no label was passed, send message to all streams
-      return pluginFns.public[options](  
+      return pluginFns.public[ options ](  
                 arguments[1] ?
-                  arguments[1]  :
-                  '*'
+                  arguments[1] :
+                  "*"
               );
     }
 
     //  If params were passed in as an object, normalize to a query string
-    options.data    = options.data && $.isPlainObject(options.data) ? 
-                        $.param(options.data) : 
-                        options.data;      
+    options.data = options.data && jQuery.isPlainObject( options.data ) ? 
+                        jQuery.param( options.data ) :
+                        options.data;
 
     //  Mimick the native behavior?
-    if ( !options.url || typeof options.url !== 'string'  ) {
-      throw new SyntaxError('Not enough arguments: Must provide a url');
+    if ( !options.url || typeof options.url !== "string"  ) {
+      throw new SyntaxError("Not enough arguments: Must provide a url");
     }
 
 
     //  If no explicit label, set internal label
-    options.label   = !options.label ? 
-                        options.url + '?' + options.data : 
+    options.label = !options.label ? 
+                        options.url + "?" + options.data : 
                         options.label;
 
 
     //  Create new options object
-    _options        = $.extend({}, stream.defaults, options);
+    opts = jQuery.extend({}, stream.defaults, options);
 
     //  Create empty object in `stream.cache`
-    stream.cache[_options.label] = {
-      options: _options
+    stream.cache[ opts.label ] = {
+      options: opts
     };
 
 
     //  Determine and declare `stream`
-    _stream  = !isNative ?
+    streamType = !isNative ?
                 //  If not native, open a polling fallback
-                pluginFns._private.openPollingSource(_options) :
-                new EventSource(_options.url + ( _options.data ? '?' + _options.data : '' ) );
+                pluginFns._private.openPollingSource(opts) :
+                new EventSource(opts.url + ( opts.data ? "?" + opts.data : '' ) );
 
     //  ADd to event sources
-    stream.cache[_options.label] = $.extend({}, stream.setup, {
-      stream: _stream, 
+    stream.cache[ opts.label ] = jQuery.extend({}, stream.setup, {
+      stream: streamType, 
       isNative: isNative, 
-      options: _options
+      options: opts
     });
 
 
     if ( isNative ) {
-      pluginFns._private.openEventSource(_options);
+      pluginFns._private.openEventSource(opts);
     }
 
     return stream.cache;
   };
 
 
-})(jQuery);
+})(jQuery, window);
