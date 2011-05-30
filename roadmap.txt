@@ -1,3 +1,10 @@
+	Project/Repo
+	
+		1. Build process
+		
+			Uglify.js
+			JSHint
+
 	Implementation
 	
 		1. Rewrite build from and include jQuery.Deferred objects
