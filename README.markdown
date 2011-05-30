@@ -1,5 +1,7 @@
 # jQuery.EventSource
 
+## 2011-05-30 Update: Tests passing 100% in Firefox/Aurora 6
+
 # TODO: Rewrite with jQuery Deferred Objects
 
 
