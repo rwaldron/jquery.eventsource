@@ -31,7 +31,7 @@ describe("jQuery.EventSource", function() {
   
   it("$.eventsource stream object", function() {
     assert(streams[labelfor]).should(include, 'history');
-    assert(streams[labelfor]).should(include, 'isNative');
+    assert(streams[labelfor]).should(include, 'isHostApi');
     assert(streams[labelfor]).should(include, 'lastEventId');
     assert(streams[labelfor]).should(include, 'options');
     assert(streams[labelfor]).should(include, 'stream');
@@ -40,7 +40,7 @@ describe("jQuery.EventSource", function() {
   it("$.eventsource stream object should be", function() {
   
     
-    assert(streams[labelfor].isNative).should(beA, Boolean);
+    assert(streams[labelfor].isHostApi).should(beA, Boolean);
     assert(streams[labelfor].history).should(beAn, Object);
     assert(streams[labelfor].options).should(beAn, Object);
     //assert(streams[labelfor].stream).should(beA, stypeOf);

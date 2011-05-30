@@ -316,7 +316,7 @@ test("$.eventsource is a function", function() {
 
       $.each(streamsObj, function (i, obj) {
 
-        equals( typeof obj.isNative, 'boolean', 'Stream.isNative exists and is a boolean value' );
+        equals( typeof obj.isHostApi, 'boolean', 'Stream.isHostApi exists and is a boolean value' );
 
         equals( typeof obj.lastEventId, 'number', 'Stream.lastEventId exists and is a boolean value' );
 
@@ -327,11 +327,11 @@ test("$.eventsource is a function", function() {
         equals( obj.options.open && $.isFunction(obj.options.open), true, 'Stream.options.message exists and is a function' );
 
 
-        if ( obj.isNative ) {
+        if ( obj.isHostApi ) {
           equals( obj.stream.toString(), '[object EventSource]',  'Native Streams are [object EventSource]'  );
         } 
 
-        if ( !obj.isNative ) {
+        if ( !obj.isHostApi ) {
           if ( window.XMLHttpRequest ) {
             equals( obj.stream.toString(), '[object XMLHttpRequest]',  'Non-Native Streams are [object XMLHttpRequest]'  );
           }

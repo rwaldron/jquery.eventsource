@@ -1,5 +1,8 @@
-
-
+	Implementation
+	
+		1. Rewrite build from and include jQuery.Deferred objects
+		2. DRY out host api/polyfill implementation
+			1. Should use same message handler
 
 
   Error Handling
