@@ -10,8 +10,8 @@
 	jQuery.extend( jQuery.ajaxSettings.accepts, {
 		stream: "text/event-stream"
 	});
-	
-	var stream	= {
+
+	var stream = {
 	
 		defaults: {
 			// Stream identity
@@ -69,25 +69,25 @@
 
 				stream.cache[ label ].stream.addEventListener("open", function (event) {
 					if ( stream.cache[label] ) {
-					
-						this["label"]	= label;
-						
+
+						this.label = label;
+
 						stream.cache[label].options.open.call(this, event);
-					}	 
+					}
 				}, false);
 
 				stream.cache[label].stream.addEventListener("message", function (event) {
+          
+					var streamData = [];
 
 					if ( stream.cache[label] ) {
 
-						var streamData	= [];
-
 						streamData[ streamData.length ] = jQuery.parseJSON( event.data );
 
-						this["label"]	= label;
+						this.label = label;
 
 						stream.cache[label].lastEventId = +event.lastEventId;
-						stream.cache[label].history[stream.cache[label].lastEventId]	= streamData;
+						stream.cache[label].history[stream.cache[label].lastEventId] = streamData;
 						stream.cache[label].options.message.call(this, streamData[0] ? streamData[0] : null, {
 							data: streamData,
 							lastEventId: stream.cache[label].lastEventId
@@ -101,20 +101,20 @@
 			}, 
 			// open fallback event source
 			openPollingSource: function ( options ) {
-				var label = options.label;
-				
+				var label = options.label, 
+					source;
+
 				if ( stream.cache[label] ) {
-				
-					var source	= jQuery.ajax({
+
+					source = jQuery.ajax({
 						type: "GET",
 						url: options.url,
 						data: options.data,
 						beforeSend: function () {
 							if ( stream.cache[label] ) {
-								
-								this["label"] = label;
+								this.label = label;
 								stream.cache[label].options.open.call( this );
-							}	 
+							}
 						},
 						success: function ( data ) {
 
@@ -127,14 +127,14 @@
 								idx = 0, length = streamData.length;
 
 							if ( jQuery.isArray(streamData) ) {
-							
+
 								for ( ; idx < length; idx++ ) {
 
-									tempdata	= streamData[idx].split("data: ")[ 1 ];
+									tempdata = streamData[idx].split("data: ")[ 1 ];
 
 									// Convert `dataType` here
 									if ( options.dataType === "json" ) {
-										tempdata	= jQuery.parseJSON( tempdata );
+										tempdata = jQuery.parseJSON( tempdata );
 									}
 
 									parsedData[ parsedData.length ] = tempdata;
@@ -143,10 +143,10 @@
 
 							if ( stream.cache[label] ) {
 
-								this["label"] = label;
+								this.label = label;
 
 								stream.cache[label].lastEventId++;
-								stream.cache[label].history[stream.cache[label].lastEventId]	= parsedData;
+								stream.cache[label].history[stream.cache[label].lastEventId] = parsedData;
 								stream.cache[label].options.message.call(this, parsedData[0] ? parsedData[0] : null, {
 									data: parsedData,
 									lastEventId: stream.cache[label].lastEventId
@@ -188,8 +188,8 @@
 
 		// If params were passed in as an object, normalize to a query string
 		options.data = options.data && jQuery.isPlainObject( options.data ) ? 
-												jQuery.param( options.data ) :
-												options.data;
+										jQuery.param( options.data ) :
+										options.data;
 
 		// Mimick the host api behavior?
 		if ( !options.url || typeof options.url !== "string"	) {
