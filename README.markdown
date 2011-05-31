@@ -36,6 +36,8 @@ and falls back to Ajax polling logic when it's not. Contributions must conform t
 [http://yakyakface.com/jquery.eventsource/unit-tests/](http://yakyakface.com/jquery.eventsource/unit-tests/)
 
 
+For a libray agnostic polyfill that offers base implementation fallback, check out Remy Sharp's work here:
+[pollyfills/EventSource.js](https://github.com/remy/polyfills/blob/master/EventSource.js)
 
 
 ## Usage
