@@ -130,14 +130,16 @@
 
 								for ( ; idx < length; idx++ ) {
 
-									tempdata = streamData[idx].split("data: ")[ 1 ];
+									if ( streamData[idx] ) {
+										tempdata = streamData[idx].split("data: ")[ 1 ];
 
-									// Convert `dataType` here
-									if ( options.dataType === "json" ) {
-										tempdata = jQuery.parseJSON( tempdata );
+										// Convert `dataType` here
+										if ( options.dataType === "json" ) {
+											tempdata = jQuery.parseJSON( tempdata );
+										}
+
+										parsedData[ parsedData.length ] = tempdata;
 									}
-
-									parsedData[ parsedData.length ] = tempdata;
 								}
 							}
 
