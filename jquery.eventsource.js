@@ -35,26 +35,29 @@
 	pluginFns	 = {
 
 		public: {
-			close: function ( label ) {
+			close: function( label ) {
 
-				var cache = {};
-				
-				if ( label !== "*" ) {
+				var tmp = {};
 
-					for ( var prop in stream.cache ) {
-						if ( label	!== prop ) {
-							cache[ prop ] = stream.cache[ prop ];
-						}
+				if ( !label || label === "*" ) {
+					stream.cache = {};
+
+					return stream.cache;
+				}
+
+				for ( var prop in stream.cache ) {
+					if ( label !== prop ) {
+						tmp[ prop ] = stream.cache[ prop ];
 					}
 				}
 
-				stream.cache = cache;
+				stream.cache = tmp;
 
 				return stream.cache;
 			}, 
-			streams: function ( label ) {
+			streams: function( label ) {
 
-				if ( label === "*" ) {
+				if ( !label || label === "*" ) {
 					return stream.cache;
 				}
 
@@ -64,10 +67,10 @@
 		_private: {
 
 			// Open a host api event source 
-			openEventSource: function ( options ) {
+			openEventSource: function( options ) {
 				var label = options.label;
 
-				stream.cache[ label ].stream.addEventListener("open", function (event) {
+				stream.cache[ label ].stream.addEventListener("open", function(event) {
 					if ( stream.cache[label] ) {
 
 						this.label = label;
@@ -76,7 +79,7 @@
 					}
 				}, false);
 
-				stream.cache[label].stream.addEventListener("message", function (event) {
+				stream.cache[label].stream.addEventListener("message", function(event) {
           
 					var streamData = [];
 
@@ -100,7 +103,7 @@
 				return stream.cache[label].stream;
 			}, 
 			// open fallback event source
-			openPollingSource: function ( options ) {
+			openPollingSource: function( options ) {
 				var label = options.label, 
 					source;
 
@@ -110,13 +113,13 @@
 						type: "GET",
 						url: options.url,
 						data: options.data,
-						beforeSend: function () {
+						beforeSend: function() {
 							if ( stream.cache[label] ) {
 								this.label = label;
 								stream.cache[label].options.open.call( this );
 							}
 						},
-						success: function ( data ) {
+						success: function( data ) {
 
 							var tempdata,
 								label = options.label,
@@ -156,7 +159,7 @@
 
 
 								setTimeout(
-									function () {
+									function() {
 										pluginFns._private.openPollingSource.call( this, options );
 									},
 									// matches speed of host api EventSource
@@ -236,5 +239,10 @@
 		return stream.cache;
 	};
 
+	jQuery.each( [ "close", "streams" ], function( idx, name ) {
+		jQuery.eventsource[ name ] = function( arg ) {
+			return jQuery.eventsource( name, arg || "*" );
+		};
+	});
 
 })(jQuery, window);
