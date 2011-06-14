@@ -1,8 +1,8 @@
 <?php
 header("Content-Type: text/event-stream\n\n");
 
-// despite not having the while(true){}
-// this seems to repeat pushing messages to the client
+echo 'retry: 1000' . "\n\n";
+
 echo 'data: ' . json_encode(
                   array(
                     0 => array( 
@@ -15,5 +15,6 @@ echo 'data: ' . json_encode(
                     )
                   )
                 ) . "\n";
+
 
 ?>

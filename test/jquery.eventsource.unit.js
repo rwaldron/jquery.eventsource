@@ -13,14 +13,12 @@ $(function() {
   var params = location.search.slice( 1 ).split( "&" ), 
     pairs = {};
 
-  params.forEach(function(param) {
+  $.each( params, function(idx, param) {
 
     var tmp = param.split("=");
 
     pairs[ tmp[0] ] = tmp[1];
   });
-
-  //document.querySelectorAll("iframe")[0].style.display = "none";
 
   if ( pairs.nospecit ) {
     $("iframe").hide();
@@ -28,11 +26,11 @@ $(function() {
 });
 
 
-test("jQuery.eventsource is a function", function() {
+test("is a function", function() {
 
   expect(7);
   
-  ok( jQuery.eventsource, "jQuery.eventsource exists" );
+  ok( jQuery.eventsource, "exists" );
   equal( typeof jQuery.eventsource, "function", "jQuery.eventsource() is a Function" );
   
   ok( jQuery.eventsource.streams, "jQuery.eventsource.streams exists" );
@@ -45,7 +43,7 @@ test("jQuery.eventsource is a function", function() {
 
 });
   
-test("jQuery.eventsource callbacks", function() {  
+test("callbacks", function() {  
   
   var expects = 12, 
     count = 0;
@@ -64,52 +62,52 @@ test("jQuery.eventsource callbacks", function() {
   }
 
   stop();
-  // PLAIN TEXT EXAMPLE - NO CONTENT TYPE GIVEN
+  // PLAIN TEXT EXAMPLE NO CONTENT TYPE GIVEN
   jQuery.eventsource({
     label: "text-event-source",
     url: "../test-event-sources/event-source-1.php",
     open: function() {
-      okPlus( true, "#1 jQuery.eventsource fires onopen callback" );
+      okPlus( true, "#1 fires onopen callback" );
     },
     message: function(data) {
-      okPlus( true, "#1 jQuery.eventsource fires onmessage callback" );
+      okPlus( true, "#1 fires onmessage callback" );
       
-      okPlus( data, "#1 jQuery.eventsource returns data");
+      okPlus( data, "#1 returns data");
       
       okPlus( typeof jQuery.eventsource("close", "text-event-source") === "object", 'jQuery.eventsource("close", "text-event-source") must return an object' );        
     }
   });
 
-  // PLAIN TEXT EXAMPLE - HAS CONTENT TYPE
+  // PLAIN TEXT EXAMPLE HAS CONTENT TYPE
   jQuery.eventsource({
     label: "text-event-source-ct",
     url: "../test-event-sources/event-source-1.php",
     dataType: "text",
     open: function() {
-      okPlus( true, "#2 jQuery.eventsource fires onopen callback" );
+      okPlus( true, "#2 fires onopen callback" );
     },
     message: function(data) {
 
-      okPlus( true, "#2 jQuery.eventsource fires onmessage callback" );
-      okPlus( data, "#2 jQuery.eventsource returns data");
+      okPlus( true, "#2 fires onmessage callback" );
+      okPlus( data, "#2 returns data");
       okPlus( typeof jQuery.eventsource("close", "text-event-source-ct") === "object", 'jQuery.eventsource("close", "text-event-source-ct") must return an object' );        
 
     }
   });
   
-  // PLAIN TEXT EXAMPLE - HAS CONTENT TYPE
+  // PLAIN TEXT EXAMPLE HAS CONTENT TYPE
 
   jQuery.eventsource({
     label: "json-event-source",
     url: "../test-event-sources/event-source-2.php",
     dataType: "json",
     open: function() {
-      okPlus( true, "#3 jQuery.eventsource fires onopen callback" );
+      okPlus( true, "#3 fires onopen callback" );
     },
     message: function(data) {
 
-      okPlus( true, "#3 jQuery.eventsource fires onmessage callback" );
-      okPlus( data, "#3 jQuery.eventsource returns data");
+      okPlus( true, "#3 fires onmessage callback" );
+      okPlus( data, "#3 returns data");
       okPlus( typeof jQuery.eventsource("close", "json-event-source") === "object", 'jQuery.eventsource("close", "json-event-source") must return an object' );        
 
     }
@@ -117,7 +115,7 @@ test("jQuery.eventsource callbacks", function() {
 
 });
 
-test("jQuery.eventsource open/close", function() {
+test("open/close", function() {
   var expects = 5,
     count = 0;
 
@@ -136,15 +134,15 @@ test("jQuery.eventsource open/close", function() {
     url: "../test-event-sources/event-source-2.php",
     dataType: "json",
     open: function() {
-      ok( true, "jQuery.eventsource fires onopen callback" );
+      ok( true, "fires onopen callback" );
       plus();
     },
     message: function(data) {
 
-      ok( true, "jQuery.eventsource fires onmessage callback" );
+      ok( true, "fires onmessage callback" );
       plus();
 
-      ok( data, "jQuery.eventsource returns data");
+      ok( data, "returns data");
       plus();
 
       equal( typeof jQuery.eventsource.close("json-event-source-stream"), "object", 'jQuery.eventsource.close("json-event-source-stream") must return an object' );
@@ -157,7 +155,7 @@ test("jQuery.eventsource open/close", function() {
 });
 
 
-test("jQuery.eventsource - multiple concurrent sources - scope tests", function() {
+test("multiple concurrent sources scope tests", function() {
   var expects = 12, 
     count = 0, 
     down = 3;
@@ -200,7 +198,7 @@ test("jQuery.eventsource - multiple concurrent sources - scope tests", function(
   });
 });
 
-test("jQuery.eventsource - breakage tests", function() {
+test("breakage tests", function() {
 
   var expects = 7, 
     count = 0;
@@ -294,7 +292,7 @@ test("jQuery.eventsource - breakage tests", function() {
   }
 });
 
-test("jQuery.eventsource streams object", function() {  
+test("streams object", function() {  
 
   var expects = 13,
     count = 0;
@@ -370,7 +368,45 @@ test("jQuery.eventsource streams object", function() {
 });
 
 
-test("jQuery.eventsource streams Are Closed", function() {
+test("settable retry time in ms", function() {
+
+  var expects = 2,
+    count = 0,
+    stream;
+
+  expect( expects );
+
+  function plus() {
+    if ( ++count === expects ) {
+      jQuery.eventsource.close();
+      start();
+    }
+  }
+
+  stop();
+
+  // labeled stream
+  jQuery.eventsource({
+    label: "retry-stream",
+    url: "../test-event-sources/event-source-retry.php",
+    dataType: "json",
+    message: function() {
+
+      var stream = jQuery.eventsource.streams("retry-stream"),
+      streamretry = jQuery.eventsource.streams("retry-stream").retry;
+
+      if ( !stream.isHostApi ) {
+        equal( streamretry, 1000, "jQuery.eventsource.streams('retry-stream') has a retry time of 1000ms" );
+      } else {
+        ok( true, "retry time is managed by the implementation when provided from a server message" );
+      }
+      plus();
+    }
+  });
+});
+
+
+test("streams Are Closed", function() {
 
   var expects = 2, 
     count = 0;
