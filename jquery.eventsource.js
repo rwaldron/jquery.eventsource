@@ -41,6 +41,12 @@
 				var tmp = {};
 
 				if ( !label || label === "*" ) {
+					for ( var prop in stream.cache ) {
+						if ( stream.cache[ prop ].isHostApi ) {
+							stream.cache[ prop ].stream.close();
+						}
+					}
+
 					stream.cache = {};
 
 					return stream.cache;
@@ -49,6 +55,10 @@
 				for ( var prop in stream.cache ) {
 					if ( label !== prop ) {
 						tmp[ prop ] = stream.cache[ prop ];
+					} else {
+						if ( stream.cache[ prop ].isHostApi ) {
+							stream.cache[ prop ].stream.close();
+						}
 					}
 				}
 
