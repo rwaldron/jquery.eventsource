@@ -1,6 +1,6 @@
 /*!
  * jQuery.EventSource (jQuery.eventsource)
- * 
+ *
  * Copyright (c) 2011 Rick Waldron
  * Dual licensed under the MIT and GPL licenses.
  */
@@ -12,7 +12,7 @@
 	});
 
 	var stream = {
-	
+
 		defaults: {
 			// Stream identity
 			label: null,
@@ -23,7 +23,7 @@
 			message: jQuery.noop
 		},
 		setup: {
-			stream: {}, 
+			stream: {},
 			lastEventId: 0,
 			isHostApi: false,
 			retry: 500,
@@ -65,7 +65,7 @@
 				stream.cache = tmp;
 
 				return stream.cache;
-			}, 
+			},
 			streams: function( label ) {
 
 				if ( !label || label === "*" ) {
@@ -77,7 +77,7 @@
 		},
 		_private: {
 
-			// Open a host api event source 
+			// Open a host api event source
 			openEventSource: function( options ) {
 				var label = options.label;
 
@@ -91,7 +91,7 @@
 				}, false);
 
 				stream.cache[label].stream.addEventListener("message", function(event) {
-          
+
 					var streamData = [];
 
 					if ( stream.cache[ label ] ) {
@@ -107,12 +107,12 @@
 							lastEventId: stream.cache[ label ].lastEventId
 						}, event);
 
-						// TODO: Add custom event triggering 
+						// TODO: Add custom event triggering
 					}
 				}, false);
 
 				return stream.cache[ label ].stream;
-			}, 
+			},
 			// open fallback event source
 			openPollingSource: function( options ) {
 				var label = options.label,
@@ -139,7 +139,7 @@
 									return !!sdata && sdata;
 								}),
 								idx = 0, length = streamData.length,
-								rretryprefix = /retry/, 
+								rretryprefix = /retry/,
 								retries;
 
 							if ( jQuery.isArray( streamData ) ) {
@@ -148,7 +148,7 @@
 
 									if ( streamData[ idx ] ) {
 
-										if ( rretryprefix.test( streamData[ idx ] ) && 
+										if ( rretryprefix.test( streamData[ idx ] ) &&
 													(retries = streamData[ idx ].split("retry: ")).length ) {
 
 											if ( retries.length === 2 && !retries[ 0 ] ) {
@@ -207,7 +207,7 @@
 		// Plugin sub function
 		if ( options && !jQuery.isPlainObject( options ) && pluginFns.public[ options ] ) {
 			// If no label was passed, send message to all streams
-			return pluginFns.public[ options ](	
+			return pluginFns.public[ options ](
 								arguments[1] ?
 									arguments[1] :
 									"*"
@@ -215,7 +215,7 @@
 		}
 
 		// If params were passed in as an object, normalize to a query string
-		options.data = options.data && jQuery.isPlainObject( options.data ) ? 
+		options.data = options.data && jQuery.isPlainObject( options.data ) ?
 										jQuery.param( options.data ) :
 										options.data;
 
@@ -240,7 +240,7 @@
 		};
 
 
-		// Determine and declare `event stream` source, 
+		// Determine and declare `event stream` source,
 		// whether will be host api or XHR fallback
 		streamType = !isHostApi ?
 								// If not host api, open a polling fallback

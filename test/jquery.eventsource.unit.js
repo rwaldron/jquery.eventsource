@@ -10,7 +10,7 @@ function sizeOf(obj) {
 
 $(function() {
 
-  var params = location.search.slice( 1 ).split( "&" ), 
+  var params = location.search.slice( 1 ).split( "&" ),
     pairs = {};
 
   $.each( params, function(idx, param) {
@@ -29,10 +29,10 @@ $(function() {
 test("is a function", function() {
 
   expect(7);
-  
+
   ok( jQuery.eventsource, "exists" );
   equal( typeof jQuery.eventsource, "function", "jQuery.eventsource() is a Function" );
-  
+
   ok( jQuery.eventsource.streams, "jQuery.eventsource.streams exists" );
   equal( typeof jQuery.eventsource.streams, "function", "jQuery.eventsource.streams() is a Function" );
 
@@ -42,21 +42,21 @@ test("is a function", function() {
   equal( sizeOf( jQuery.eventsource.streams() ), 0, "There are no streams");
 
 });
-  
-test("callbacks", function() {  
-  
-  var expects = 12, 
+
+test("callbacks", function() {
+
+  var expects = 12,
     count = 0;
 
   expect( expects );
-  
-  function plus() { 
+
+  function plus() {
     if ( ++count === expects ) {
-      start(); 
+      start();
     }
   }
 
-  function okPlus() { 
+  function okPlus() {
     ok.apply(null, arguments);
     plus();
   }
@@ -71,10 +71,10 @@ test("callbacks", function() {
     },
     message: function(data) {
       okPlus( true, "#1 fires onmessage callback" );
-      
+
       okPlus( data, "#1 returns data");
-      
-      okPlus( typeof jQuery.eventsource("close", "text-event-source") === "object", 'jQuery.eventsource("close", "text-event-source") must return an object' );        
+
+      okPlus( typeof jQuery.eventsource("close", "text-event-source") === "object", 'jQuery.eventsource("close", "text-event-source") must return an object' );
     }
   });
 
@@ -90,11 +90,11 @@ test("callbacks", function() {
 
       okPlus( true, "#2 fires onmessage callback" );
       okPlus( data, "#2 returns data");
-      okPlus( typeof jQuery.eventsource("close", "text-event-source-ct") === "object", 'jQuery.eventsource("close", "text-event-source-ct") must return an object' );        
+      okPlus( typeof jQuery.eventsource("close", "text-event-source-ct") === "object", 'jQuery.eventsource("close", "text-event-source-ct") must return an object' );
 
     }
   });
-  
+
   // PLAIN TEXT EXAMPLE HAS CONTENT TYPE
 
   jQuery.eventsource({
@@ -108,7 +108,7 @@ test("callbacks", function() {
 
       okPlus( true, "#3 fires onmessage callback" );
       okPlus( data, "#3 returns data");
-      okPlus( typeof jQuery.eventsource("close", "json-event-source") === "object", 'jQuery.eventsource("close", "json-event-source") must return an object' );        
+      okPlus( typeof jQuery.eventsource("close", "json-event-source") === "object", 'jQuery.eventsource("close", "json-event-source") must return an object' );
 
     }
   });
@@ -156,15 +156,15 @@ test("open/close", function() {
 
 
 test("multiple concurrent sources scope tests", function() {
-  var expects = 12, 
-    count = 0, 
+  var expects = 12,
+    count = 0,
     down = 3;
 
   expect( expects );
 
-  function plus() { 
+  function plus() {
     if ( ++count === expects ) {
-      start(); 
+      start();
     }
   }
 
@@ -200,18 +200,18 @@ test("multiple concurrent sources scope tests", function() {
 
 test("breakage tests", function() {
 
-  var expects = 7, 
+  var expects = 7,
     count = 0;
 
   expect( expects );
-  
-  function plus() { 
+
+  function plus() {
     if ( ++count === expects ) {
       start();
     }
   }
 
-  function okPlus() { 
+  function okPlus() {
     ok.apply(null, arguments);
     plus();
   }
@@ -292,7 +292,7 @@ test("breakage tests", function() {
   }
 });
 
-test("streams object", function() {  
+test("streams object", function() {
 
   var expects = 13,
     count = 0;
@@ -408,24 +408,24 @@ test("settable retry time in ms", function() {
 
 test("streams Are Closed", function() {
 
-  var expects = 2, 
+  var expects = 2,
     count = 0;
 
   expect( expects );
-  
-  function plus() { 
+
+  function plus() {
     if ( ++count === expects ) {
-      start(); 
+      start();
     }
   }
 
   stop();
 
   jQuery.eventsource.close();
-  
+
   equal(sizeOf(jQuery.eventsource.streams()), 0, "there are 0 active streams");
   plus();
 
-  ok( typeof jQuery.eventsource.streams() === "object", 'jQuery.eventsource.streams() must return an object' );        
+  ok( typeof jQuery.eventsource.streams() === "object", 'jQuery.eventsource.streams() must return an object' );
   plus();
 });
