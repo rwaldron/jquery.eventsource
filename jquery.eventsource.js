@@ -181,20 +181,30 @@
 									lastEventId: stream.cache[ label ].lastEventId
 								});
 
-								setTimeout(
-									function() {
-										pluginFns._private.openPollingSource.call( this, options );
-									},
-									// Use server sent retry time if exists or default retry time if not
-									( stream.cache[ label ] && stream.cache[ label ].retry ) || 500
-								);
+								pluginFns._private.pollAgain(options);
 							}
+						},
+						error: function() {
+							pluginFns._private.pollAgain(options);
 						},
 						cache: false,
 						timeout: 50000
 					});
 				}
 				return source;
+			},
+			pollAgain: function (options) {
+				var label = options.label;
+				if (stream.cache[ label ].timer)
+					clearInterval(stream.cache[ label ].timer);
+
+				stream.cache[ label ].timer = setTimeout(
+					function() {
+						pluginFns._private.openPollingSource( options );
+					},
+					// Use server sent retry time if exists or default retry time if not
+					( stream.cache[ label ] && stream.cache[ label ].retry ) || 500
+				);
 			}
 		}
 	},
