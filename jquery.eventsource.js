@@ -120,10 +120,15 @@
 
 				if ( stream.cache[ label ] ) {
 
+					var headers = {};
+					if (stream.cache[ label ].lastEventId)
+						headers['Last-Event-ID'] = stream.cache[ label ].lastEventId;
+
 					source = jQuery.ajax({
 						type: "GET",
 						url: options.url,
 						data: options.data,
+						headers: headers,
 						beforeSend: function() {
 							if ( stream.cache[ label ] ) {
 								this.label = label;
@@ -174,27 +179,40 @@
 
 								this.label = label;
 
-								stream.cache[ label ].lastEventId++;
-								stream.cache[ label ].history[ stream.cache[ label ].lastEventId ] = parsedData;
+								if (parsedData[0]) {
+									stream.cache[ label ].lastEventId = parsedData[0].id;
+									stream.cache[ label ].history[ stream.cache[ label ].lastEventId ] = parsedData;
+								}
+
 								stream.cache[ label ].options.message.call(this, parsedData[0] ? parsedData[0] : null, {
 									data: parsedData,
 									lastEventId: stream.cache[ label ].lastEventId
 								});
 
-								setTimeout(
-									function() {
-										pluginFns._private.openPollingSource.call( this, options );
-									},
-									// Use server sent retry time if exists or default retry time if not
-									( stream.cache[ label ] && stream.cache[ label ].retry ) || 500
-								);
+								pluginFns._private.pollAgain(options);
 							}
+						},
+						error: function() {
+							pluginFns._private.pollAgain(options);
 						},
 						cache: false,
 						timeout: 50000
 					});
 				}
 				return source;
+			},
+			pollAgain: function (options) {
+				var label = options.label;
+				if (stream.cache[ label ].timer)
+					clearInterval(stream.cache[ label ].timer);
+
+				stream.cache[ label ].timer = setTimeout(
+					function() {
+						pluginFns._private.openPollingSource( options );
+					},
+					// Use server sent retry time if exists or default retry time if not
+					( stream.cache[ label ] && stream.cache[ label ].retry ) || 500
+				);
 			}
 		}
 	},
