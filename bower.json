@@ -1,0 +1,10 @@
+{
+  "name": "jquery-eventsource",
+  "description": "jQuery EventSource extension",
+  "keywords": [
+    "jquery",
+    "component"
+  ],
+  "main": "jquery.eventsource.js",
+  "license": "MIT"
+}
